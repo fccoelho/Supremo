@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Tasks SYSTEM "Tasks-4.2.dtd">
 <!-- eric4 tasks file for project Supremo -->
-<!-- Saved: 2011-02-04, 16:33:40 -->
+<!-- Saved: 2011-02-07, 14:46:26 -->
 <Tasks version="4.2">
   <Task priority="1" completed="False" bugfix="False">
     <Summary>TODO: contar ocorrencias usando defaultdict</Summary>
     <Description></Description>
-    <Created>2011-02-04, 14:32:02</Created>
+    <Created>2011-02-07, 14:46:26</Created>
     <Resource>
       <Filename>clean/limpa.py</Filename>
-      <Linenumber>23</Linenumber>
+      <Linenumber>26</Linenumber>
     </Resource>
   </Task>
 </Tasks>
