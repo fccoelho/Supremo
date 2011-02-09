@@ -16,14 +16,27 @@ def busca_UF(texto):
     localiza e extrai referencias a unidade federal 
     que originou o processo
     """
-    rawstr = r"""(UF-(\D\D))+"""
-    embedded_rawstr = r"""(UF-(\D\D))+"""
+    rawstr =r"\s/\s([A-Z]{2})\s+-"
     compile_obj = re.compile(rawstr)
     match_obj = compile_obj.search(texto)
+#    print texto
     if match_obj:
 #        print match_obj.groups()
-        return match_obj.groups()[1]
+        return match_obj.groups()[0]
     
+def busca_leis(texto):
+    """
+    Localiza e extrai referencias a Leis na decisao judicail
+    """
+    rawstr = r""">*\s*([A-Z]{2,3}-[A-Z,0-9]*)|(CF)|("CAPUT")\s+"""
+    compile_obj = re.compile(rawstr)
+    match_obj = compile_obj.findall(texto)
+    matches = []
+    for m in match_obj:
+        matches.append([i for i in m if i][0])
+    print "texto: ", texto
+    print "matches: ", matches
+
     
 def conta_campos(cursor):
     cursor.execute('select decisao from t_decisoes limit 10000')
@@ -41,19 +54,34 @@ def conta_campos(cursor):
         campos.update(cs)
     return campos
     
-def extrai_dados(cursor):
+def extrai_dados(cursor,  inicio,  num):
     """
     Constroi nova tabela com Datas, Estado e leis referenciadas
     """
-    cursor.execute('select decisao,data_publicacao,data_decisao from t_decisoes limit 100,1000')
-    dados = cursor.fetchmany(10)
-    for d in dados:
-        s = BeautifulSoup(d[0].strip('[]'),  fromEncoding='IBM855')
-        c = s.findAll('pre')
-        UFs = [busca_UF(t.contents[0]) for t in c]
-        print UFs
+    cursor.execute('select decisao,tipo,data_publicacao,data_decisao from t_decisoes limit %s,%s'%(inicio, num))
+    dados = cursor.fetchmany(num)
+    UFs = []
+    for i, d in enumerate(dados):
+#        print i
+        sopa = BeautifulSoup(d[0].strip('[]'),  fromEncoding='IBM855')
+#        print sopa.originalEncoding
+        # Tag contendo informacao de UF
+        c = sopa.strong
+        uf = busca_UF(c.contents[0])
+#        print uf
+        if uf:
+            UFs.append(uf)
+        else:
+            UFs.append('NA')
+
+        # Tag contendo legislacao
+        rs  = sopa.findAll('strong', text=re.compile('^Legisla'))
+        if rs:
+            l = rs[0].next.nextSibling
+            legs = busca_leis(l.contents[0])
+    print "Falhas em Extracao de UFs: ",  num-len(UFs)
 #        print unicode(c),  type(c)
     
 if __name__ == "__main__":
 #    print conta_campos(cur)
-    extrai_dados(cur)
+    extrai_dados(cur,  1000, 50)
