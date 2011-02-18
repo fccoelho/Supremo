@@ -9,7 +9,9 @@ import MySQLdb
 
 #Configura conexoes
 db=MySQLdb.connect(host="emapserv", user="root", passwd="password",db="Supremo")
+
 cur=db.cursor()
+
 
 def busca_UF(texto):
     """
@@ -23,6 +25,17 @@ def busca_UF(texto):
     if match_obj:
 #        print match_obj.groups()
         return match_obj.groups()[0]
+        
+class BuscaLeis:
+    def __init__(self, texto):
+        self.leisfed = []
+        self.leisest = []
+        self.leismun = []
+        self.split_leis(texto)
+    def split_leis(self, texto):
+        """
+        
+        
     
 def busca_leis(texto):
     """
@@ -57,12 +70,12 @@ def conta_campos(cursor):
 def extrai_dados(cursor,  inicio,  num):
     """
     Constroi nova tabela com Datas, Estado e leis referenciadas
+    cursor ...
     """
     cursor.execute('select decisao,tipo,data_publicacao,data_decisao from t_decisoes limit %s,%s'%(inicio, num))
     dados = cursor.fetchmany(num)
     UFs = []
-    for i, d in enumerate(dados):
-#        print i
+    for d in dados:
         sopa = BeautifulSoup(d[0].strip('[]'),  fromEncoding='IBM855')
 #        print sopa.originalEncoding
         # Tag contendo informacao de UF
@@ -83,5 +96,6 @@ def extrai_dados(cursor,  inicio,  num):
 #        print unicode(c),  type(c)
     
 if __name__ == "__main__":
+    pass
 #    print conta_campos(cur)
     extrai_dados(cur,  1000, 50)
