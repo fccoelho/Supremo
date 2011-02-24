@@ -31,24 +31,54 @@ class BuscaLeis:
         self.leisfed = []
         self.leisest = []
         self.leismun = []
-        self.split_leis(texto)
+        self.outrasleis = []
+        pieces = self.split_leis(texto)
+        self.parse_leis(pieces)
+#        print "==> leis federais: ",  self.leisfed
+#        print "==> leis estaduais: ",  self.leisest
+#        print "==> leis municipais: ",  self.leismun
+#        print "==> Outras leis: ",  self.outrasleis
+        
     def split_leis(self, texto):
         """
-        
-        
-    
-def busca_leis(texto):
-    """
-    Localiza e extrai referencias a Leis na decisao judicail
-    """
-    rawstr = r""">*\s*([A-Z]{2,3}-[A-Z,0-9]*)|(CF)|("CAPUT")\s+"""
-    compile_obj = re.compile(rawstr)
-    match_obj = compile_obj.findall(texto)
-    matches = []
-    for m in match_obj:
-        matches.append([i for i in m if i][0])
-    print "texto: ", texto
-    print "matches: ", matches
+        separa texto em leis individuais
+        """
+        pieces = []
+        rawstr = r"""LEG-"""
+        compile_obj = re.compile(rawstr)
+        pstart = [m.start() for m in compile_obj.finditer(str(texto))]
+        for i in range(len(pstart)):
+            if i == len(pstart)-1:
+                pieces.append(texto[pstart[i]:])
+                break
+            pieces.append(texto[pstart[i]:pstart[i+1]])
+        return pieces
+    def parse_leis(self, pieces):
+        """
+        Parseia cada lei classificando em Lei Federal, Estadual e Municipal 
+        """
+        rawstr = r""">*\s*([A-Z]{2,3}-[A-Z,0-9]*)|(CF)|("CAPUT")\s+"""
+        compile_obj = re.compile(rawstr)
+        for p in pieces:
+            match_obj = compile_obj.findall(p)
+            matches = []
+            for m in match_obj:
+                matches.append([i for i in m if i][0])
+            if matches:
+                if matches[0] == 'LEG-FED':
+                    self.leisfed.append(matches)
+                elif matches[0] == 'LEG-EST':
+                    #print p
+                    self.leisest.append(matches)
+                elif matches[0] == 'LEG-MUN':
+                    print p
+                    self.leismun.append(matches)
+                else:
+                    print p
+                    self.outrasleis.append(matches)
+#        print "texto: ", p
+#        print "matches: ", matches
+
 
     
 def conta_campos(cursor):
@@ -91,11 +121,12 @@ def extrai_dados(cursor,  inicio,  num):
         rs  = sopa.findAll('strong', text=re.compile('^Legisla'))
         if rs:
             l = rs[0].next.nextSibling
-            legs = busca_leis(l.contents[0])
+            print len(l.contents)
+            legs = BuscaLeis(l.contents[0])
     print "Falhas em Extracao de UFs: ",  num-len(UFs)
 #        print unicode(c),  type(c)
     
 if __name__ == "__main__":
     pass
 #    print conta_campos(cur)
-    extrai_dados(cur,  1000, 50)
+    extrai_dados(cur,  0, 100)
