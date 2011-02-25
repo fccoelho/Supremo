@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Project SYSTEM "Project-4.6.dtd">
 <!-- eric4 project file for project Supremo -->
-<!-- Saved: 2011-02-03, 18:27:27 -->
+<!-- Saved: 2011-02-25, 08:39:08 -->
 <!-- Copyright (C) 2011 ,  -->
 <Project version="4.6">
   <Language>en</Language>
@@ -15,6 +15,7 @@
     <Source>__init__.py</Source>
     <Source>clean/__init__.py</Source>
     <Source>clean/limpa.py</Source>
+    <Source>clean/salva.py</Source>
   </Sources>
   <Forms>
   </Forms>

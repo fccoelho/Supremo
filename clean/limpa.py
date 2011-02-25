@@ -31,22 +31,25 @@ class BuscaLeis:
         self.leisfed = []
         self.leisest = []
         self.leismun = []
+        self.leisdis = []
         self.outrasleis = []
         pieces = self.split_leis(texto)
         self.parse_leis(pieces)
 #        print "==> leis federais: ",  self.leisfed
 #        print "==> leis estaduais: ",  self.leisest
 #        print "==> leis municipais: ",  self.leismun
-#        print "==> Outras leis: ",  self.outrasleis
+        print "==> Outras leis: ",  self.outrasleis
         
     def split_leis(self, texto):
         """
         separa texto em leis individuais
         """
+        if not isinstance(texto,  str):
+            texto = str(texto)
         pieces = []
         rawstr = r"""LEG-"""
-        compile_obj = re.compile(rawstr)
-        pstart = [m.start() for m in compile_obj.finditer(str(texto))]
+        compile_obj = re.compile(rawstr, re.MULTILINE| re.UNICODE)
+        pstart = [m.start() for m in compile_obj.finditer(texto) if m.start() !=-1]
         for i in range(len(pstart)):
             if i == len(pstart)-1:
                 pieces.append(texto[pstart[i]:])
@@ -68,11 +71,14 @@ class BuscaLeis:
                 if matches[0] == 'LEG-FED':
                     self.leisfed.append(matches)
                 elif matches[0] == 'LEG-EST':
-                    #print p
+#                    print p
                     self.leisest.append(matches)
                 elif matches[0] == 'LEG-MUN':
-                    print p
+#                    print p
                     self.leismun.append(matches)
+                elif matches[0] == 'LEG-DIS':
+#                    print p
+                    self.leisdis.append(matches)
                 else:
                     print p
                     self.outrasleis.append(matches)
@@ -87,8 +93,8 @@ def conta_campos(cursor):
 #    print decisoes
     campos = set([])
     for d in decisoes:
-        s = BeautifulSoup(d[0].strip('[]'),  fromEncoding='IBM855')
-#        print s.originalEncoding
+        s = BeautifulSoup(d[0].strip('[]'))#,  fromEncoding='IBM855')
+        print s.originalEncoding
         h = [i.contents[0] for i in s.findAll('strong') if  len(i.contents)==1 and len(i.contents[0]) <16]
 #        print h
         cs = set(h)
@@ -129,4 +135,4 @@ def extrai_dados(cursor,  inicio,  num):
 if __name__ == "__main__":
     pass
 #    print conta_campos(cur)
-    extrai_dados(cur,  0, 100)
+    extrai_dados(cur,  0, 200)
