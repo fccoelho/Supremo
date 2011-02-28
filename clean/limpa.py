@@ -1,3 +1,13 @@
+<<<<<<< HEAD
+import difflib
+import re
+import json
+from collections import defaultdict
+#from sqlalchemy.ext.sqlsoup import SqlSoup
+from BeautifulSoup import BeautifulSoup
+import MySQLdb
+from salva import *
+=======
 import json
 import re
 from collections import defaultdict
@@ -11,10 +21,12 @@ from salva import *
 #from sqlalchemy.ext.sqlsoup import SqlSoup
 #db = SqlSoup('mysql://root:password@emapserv/Supremo')
 #print db.t_decisoes.all()
+>>>>>>> cc726ff65e08ba1bacdf3a9fe1cd984cc9a74785
 
 #Configura conexoes
+#db = SqlSoup('mysql://root:password@emapserv/Supremo')
+#print db.t_decisoes.all()
 db=MySQLdb.connect(host="E04324", user="root", passwd="password",db="Supremo")
-
 cur=db.cursor()
 
 
@@ -124,6 +136,31 @@ def conta_campos(cursor):
         campos.update(cs)
     return campos
     
+def classifica_lei():
+    gabarito = {"esfera": {"LEG-INT", 
+                                          "LEG-FED":["LEG-FED", 
+                                                             "CF", 
+                                                             "CF-", 
+                                                             "CONSTITUIÇÃO FEDERAL",
+                                                             "EMC"]
+                                          "LEG-EST",
+                                          "LEG-MUN",
+                                          "LEG-DIS"}, 
+                        "lei": ["CF", "CF-", "CONSTITUIÇÃO FEDERAL",  "EMC-", 
+                                    "LEI-",
+                                    "RGI",  "STF-",  "RISTF-",  "REGIMENTO INTERNO DO SUPREMO TRIBUNAL FEDERAL", 
+                                    "SUM-", 
+                                    "DEL-",
+                                    "CPP-",  "CÓDIGO DE PROCESSO PENAL", 
+                                    "CPC-",  "CÓDIGO DE PROCESSO CIVIL", 
+                                    "ADCT"], 
+                        "ano": ["ANO-"], 
+                        "artigo": ["ART-"],
+                        "inciso": ["INC-"], 
+                        "paragrafo": ["PAR-",  "PARÁGRAFO ÚNICO",  "PARAGRAFO UNICO"], 
+                        "letra": ["LET-"]
+                     }
+
 def extrai_dados(cursor,  inicio,  num):
     """
     Constroi nova tabela com Datas, Estado e leis referenciadas
