@@ -137,28 +137,29 @@ def conta_campos(cursor):
     return campos
     
 def classifica_lei():
-    gabarito = {}
-    gabarito["esfera"] = {"LEG-INT","LEG-FED":[],  "LEG-EST",  "LEG-MUN",  "LEG-DIS"}
-    gabarito["esfera"].["LEG-FED"].append("LEG-FED")
-    gabarito["esfera"].["LEG-FED"].append("CF")
-    gabarito["esfera"].["LEG-FED"].append("CF-1988")
-    gabarito["esfera"].["LEG-FED"].append("CF-1969")
-    gabarito["esfera"].["LEG-FED"].append("CONSTITUIÇÃO FEDERAL")
-    gabarito["esfera"].["LEG-FED"].append("EMC")
-    gabarito["lei"] = []
-    gabarito["lei"].append("CF", "CF-", "CONSTITUIÇÃO FEDERAL",  "EMC-")
-    gabarito["lei"].append("LEI-"]
-    gabarito["lei"].append("RGI",  "STF-",  "RISTF-",  "REGIMENTO INTERNO DO SUPREMO TRIBUNAL FEDERAL"]
-    gabarito["lei"].append("SUM-")
-    gabarito["lei"].append("DEL-")
-    gabarito["lei"].append("CPP-",  "CÓDIGO DE PROCESSO PENAL")
-    gabarito["lei"].append("CPC-",  "CÓDIGO DE PROCESSO CIVIL")
-    gabarito["lei"].append("ADCT")
-    gabarito["ano"] = ["ANO-"]
-    gabarito["artigo"] = ["ART-"]
-    gabarito["inciso"] = ["INC-"]
-    gabarito["paragrafo"] = ["PAR-",  "PARÁGRAFO ÚNICO",  "PARAGRAFO UNICO"]
-    gabarito["letra"] = ["LET-"]
+    gabarito = {"esfera": {"LEG-INT", 
+                                          "LEG-FED":["LEG-FED", 
+                                                             "CF", 
+                                                             "CF-", 
+                                                             "CONSTITUIÇÃO FEDERAL",
+                                                             "EMC"]
+                                          "LEG-EST",
+                                          "LEG-MUN",
+                                          "LEG-DIS"}, 
+                        "lei": ["CF", "CF-", "CONSTITUIÇÃO FEDERAL",  "EMC-", 
+                                    "LEI-",
+                                    "RGI",  "STF-",  "RISTF-",  "REGIMENTO INTERNO DO SUPREMO TRIBUNAL FEDERAL", 
+                                    "SUM-", 
+                                    "DEL-",
+                                    "CPP-",  "CÓDIGO DE PROCESSO PENAL", 
+                                    "CPC-",  "CÓDIGO DE PROCESSO CIVIL", 
+                                    "ADCT"], 
+                        "ano": ["ANO-"], 
+                        "artigo": ["ART-"],
+                        "inciso": ["INC-"], 
+                        "paragrafo": ["PAR-",  "PARÁGRAFO ÚNICO",  "PARAGRAFO UNICO"], 
+                        "letra": ["LET-"]
+                     }
 
 def extrai_dados(cursor,  inicio,  num):
     """
