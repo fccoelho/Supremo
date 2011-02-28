@@ -1,6 +1,7 @@
 import difflib
 from collections import defaultdict
 import re
+import json
 #from sqlalchemy.ext.sqlsoup import SqlSoup
 from BeautifulSoup import BeautifulSoup
 #db = SqlSoup('mysql://root:password@emapserv/Supremo')
@@ -28,20 +29,31 @@ def busca_UF(texto):
         return match_obj.groups()[0]
         
 class BuscaLeis:
-    def __init__(self, texto):
-        self.leisfed = []
-        self.leisest = []
-        self.leismun = []
-        self.leisdis = []
-        self.leisint = []
-        self.outrasleis = []
+    def __init__(self):
+        self.data = defaultdict(lambda:[])
+        
+#        print "==> leis federais: ",  self.data['LEG-FED']
+#        print "==> leis estaduais: ",  self.data['LEG-EST']
+#        print "==> leis municipais: ",  self.data['LEG-MUN']
+#        print "==> leis Distritais: ",  self.data['LEG-DIS']
+#        print "==> leis Internacionais: ",  self.data['LEG-INT']
+#        print "==> Outras leis: ",  self.data['outras']
+
+    def analisa(self, texto):
+        """
+        Recebe texto da secao legislacao de uma decisao
+        e as analisa.
+        """
         pieces = self.split_leis(texto)
         self.parse_leis(pieces)
-        print "==> leis federais: ",  self.leisfed
-        print "==> leis estaduais: ",  self.leisest
-        print "==> leis municipais: ",  self.leismun
-        print "==> Outras leis: ",  self.outrasleis
-
+        return self.dump_to_json()
+        
+    def dump_to_json(self):
+        """
+        Retorna informacoes coletadas por esta instancia
+        como uma string em formato JSON
+        """
+        return json.dumps(dict(self.data))
         
     def split_leis(self, texto):
         """
@@ -72,26 +84,24 @@ class BuscaLeis:
                 matches.append([i for i in m if i][0])
             if matches:
                 if 'FED' in matches[0]:# == 'LEG-FED':
-                    self.leisfed.append(matches)
+                    self.data['LEG-FED'].append(matches)
                 elif 'EST' in matches[0]:# == 'LEG-EST':
 #                    print p
-                    self.leisest.append(matches)
+                    self.data['LEG-EST'].append(matches)
                 elif matches[0] == 'LEG-MUN':
 #                    print p
-                    self.leismun.append(matches)
+                    self.data['LEG-MUN'].append(matches)
                 elif matches[0] == 'LEG-DIS':
 #                    print p
-                    self.leisdis.append(matches)
+                    self.data['LEG-DIS'].append(matches)
                 elif matches[0] == 'LEG-INT':
 #                    print p
-                    self.leisint.append(matches)
+                    self.data['LEG-INT'].append(matches)
                 else:
 #                    print p,  matches[0]
-                    self.outrasleis.append(matches)
+                    self.data['outras'].append(matches)
 #        print "texto: ", p
 #        print "matches: ", matches
-
-
     
 def conta_campos(cursor):
     cursor.execute('select decisao from t_decisoes limit 10000')
@@ -137,7 +147,8 @@ def extrai_dados(cursor,  inicio,  num):
         if rs:
             l = rs[0].next.nextSibling
 #            print len(l.contents)
-            legs = BuscaLeis(l.contents[0])
+            legs = BuscaLeis()
+            legs.analisa(l.contents[0])
             
     print "Falhas em Extracao de UFs: ",  num-len(UFs)
 #        print unicode(c),  type(c)
