@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 import difflib
 import re
 import json
@@ -7,21 +7,13 @@ from collections import defaultdict
 from BeautifulSoup import BeautifulSoup
 import MySQLdb
 from salva import *
-=======
-import json
-import re
-from collections import defaultdict
 
-import MySQLdb
-from BeautifulSoup import BeautifulSoup
-
-from salva import *
 
 
 #from sqlalchemy.ext.sqlsoup import SqlSoup
 #db = SqlSoup('mysql://root:password@emapserv/Supremo')
 #print db.t_decisoes.all()
->>>>>>> cc726ff65e08ba1bacdf3a9fe1cd984cc9a74785
+
 
 #Configura conexoes
 #db = SqlSoup('mysql://root:password@emapserv/Supremo')
@@ -137,15 +129,17 @@ def conta_campos(cursor):
     return campos
     
 def classifica_lei():
-    gabarito = {"esfera": {"LEG-INT", 
+    gabarito = {"esfera": {"LEG-INT":["LEG-INT", ], 
                                           "LEG-FED":["LEG-FED", 
                                                              "CF", 
                                                              "CF-", 
                                                              "CONSTITUIÇÃO FEDERAL",
-                                                             "EMC"]
-                                          "LEG-EST",
-                                          "LEG-MUN",
-                                          "LEG-DIS"}, 
+                                                             "EMC"
+                                                             ], 
+                                          "LEG-EST":["LEG-EST"],
+                                          "LEG-MUN":["LEG-MUN"],
+                                          "LEG-DIS":["LEG-DIS"]
+                                          }, 
                         "lei": ["CF", "CF-", "CONSTITUIÇÃO FEDERAL",  "EMC-", 
                                     "LEI-",
                                     "RGI",  "STF-",  "RISTF-",  "REGIMENTO INTERNO DO SUPREMO TRIBUNAL FEDERAL", 
@@ -153,7 +147,8 @@ def classifica_lei():
                                     "DEL-",
                                     "CPP-",  "CÓDIGO DE PROCESSO PENAL", 
                                     "CPC-",  "CÓDIGO DE PROCESSO CIVIL", 
-                                    "ADCT"], 
+                                    "ADCT"
+                                    ], 
                         "ano": ["ANO-"], 
                         "artigo": ["ART-"],
                         "inciso": ["INC-"], 
