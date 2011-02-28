@@ -31,13 +31,6 @@ def busca_UF(texto):
 class BuscaLeis:
     def __init__(self):
         self.data = defaultdict(lambda:[])
-        
-#        print "==> leis federais: ",  self.data['LEG-FED']
-#        print "==> leis estaduais: ",  self.data['LEG-EST']
-#        print "==> leis municipais: ",  self.data['LEG-MUN']
-#        print "==> leis Distritais: ",  self.data['LEG-DIS']
-#        print "==> leis Internacionais: ",  self.data['LEG-INT']
-#        print "==> Outras leis: ",  self.data['outras']
 
     def analisa(self, texto):
         """
@@ -53,7 +46,9 @@ class BuscaLeis:
         Retorna informacoes coletadas por esta instancia
         como uma string em formato JSON
         """
-        return json.dumps(dict(self.data))
+        d = self.data
+        self.data = defaultdict(lambda:[])
+        return json.dumps(dict(d))
         
     def split_leis(self, texto):
         """
@@ -127,6 +122,7 @@ def extrai_dados(cursor,  inicio,  num):
     cursor.execute('select decisao,tipo,data_publicacao,data_decisao from t_decisoes limit %s,%s'%(inicio, num))
     dados = cursor.fetchmany(num)
     UFs = []
+    legs = BuscaLeis()
     for d in dados:
         sopa = BeautifulSoup(d[0].strip('[]'),  fromEncoding='IBM855')
 #        print sopa.originalEncoding
@@ -147,8 +143,7 @@ def extrai_dados(cursor,  inicio,  num):
         if rs:
             l = rs[0].next.nextSibling
 #            print len(l.contents)
-            legs = BuscaLeis()
-            legs.analisa(l.contents[0])
+            print legs.analisa(l.contents[0])
             
     print "Falhas em Extracao de UFs: ",  num-len(UFs)
 #        print unicode(c),  type(c)
