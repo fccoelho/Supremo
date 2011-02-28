@@ -69,6 +69,7 @@ class BuscaLeis:
                 break
             pieces.append(texto[pstart[i]:pstart[i+1]])
         return pieces
+        
     def parse_leis(self, pieces):
         """
         Parseia cada lei classificando em Lei Federal, Estadual e Municipal 
