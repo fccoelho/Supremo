@@ -1,17 +1,16 @@
 import difflib
-from collections import defaultdict
 import re
 import json
+from collections import defaultdict
 #from sqlalchemy.ext.sqlsoup import SqlSoup
 from BeautifulSoup import BeautifulSoup
-#db = SqlSoup('mysql://root:password@emapserv/Supremo')
-#print db.t_decisoes.all()
 import MySQLdb
 from salva import *
 
 #Configura conexoes
+#db = SqlSoup('mysql://root:password@emapserv/Supremo')
+#print db.t_decisoes.all()
 db=MySQLdb.connect(host="E04324", user="root", passwd="password",db="Supremo")
-
 cur=db.cursor()
 
 
@@ -66,6 +65,7 @@ class BuscaLeis:
                 break
             pieces.append(texto[pstart[i]:pstart[i+1]])
         return pieces
+        
     def parse_leis(self, pieces):
         """
         Parseia cada lei classificando em Lei Federal, Estadual e Municipal 
@@ -114,6 +114,30 @@ def conta_campos(cursor):
         campos.update(cs)
     return campos
     
+def classifica_lei():
+    gabarito = {}
+    gabarito["esfera"] = {"LEG-INT","LEG-FED":[],  "LEG-EST",  "LEG-MUN",  "LEG-DIS"}
+    gabarito["esfera"].["LEG-FED"].append("LEG-FED")
+    gabarito["esfera"].["LEG-FED"].append("CF")
+    gabarito["esfera"].["LEG-FED"].append("CF-1988")
+    gabarito["esfera"].["LEG-FED"].append("CF-1969")
+    gabarito["esfera"].["LEG-FED"].append("CONSTITUIÇÃO FEDERAL")
+    gabarito["esfera"].["LEG-FED"].append("EMC")
+    gabarito["lei"] = []
+    gabarito["lei"].append("CF", "CF-", "CONSTITUIÇÃO FEDERAL",  "EMC-")
+    gabarito["lei"].append("LEI-"]
+    gabarito["lei"].append("RGI",  "STF-",  "RISTF-",  "REGIMENTO INTERNO DO SUPREMO TRIBUNAL FEDERAL"]
+    gabarito["lei"].append("SUM-")
+    gabarito["lei"].append("DEL-")
+    gabarito["lei"].append("CPP-",  "CÓDIGO DE PROCESSO PENAL")
+    gabarito["lei"].append("CPC-",  "CÓDIGO DE PROCESSO CIVIL")
+    gabarito["lei"].append("ADCT")
+    gabarito["ano"] = ["ANO-"]
+    gabarito["artigo"] = ["ART-"]
+    gabarito["inciso"] = ["INC-"]
+    gabarito["paragrafo"] = ["PAR-",  "PARÁGRAFO ÚNICO",  "PARAGRAFO UNICO"]
+    gabarito["letra"] = ["LET-"]
+
 def extrai_dados(cursor,  inicio,  num):
     """
     Constroi nova tabela com Datas, Estado e leis referenciadas
