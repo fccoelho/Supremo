@@ -6,9 +6,10 @@ from BeautifulSoup import BeautifulSoup
 #db = SqlSoup('mysql://root:password@emapserv/Supremo')
 #print db.t_decisoes.all()
 import MySQLdb
+from salva import *
 
 #Configura conexoes
-db=MySQLdb.connect(host="emapserv", user="root", passwd="password",db="Supremo")
+db=MySQLdb.connect(host="E04324", user="root", passwd="password",db="Supremo")
 
 cur=db.cursor()
 
@@ -32,13 +33,15 @@ class BuscaLeis:
         self.leisest = []
         self.leismun = []
         self.leisdis = []
+        self.leisint = []
         self.outrasleis = []
         pieces = self.split_leis(texto)
         self.parse_leis(pieces)
-#        print "==> leis federais: ",  self.leisfed
-#        print "==> leis estaduais: ",  self.leisest
-#        print "==> leis municipais: ",  self.leismun
+        print "==> leis federais: ",  self.leisfed
+        print "==> leis estaduais: ",  self.leisest
+        print "==> leis municipais: ",  self.leismun
         print "==> Outras leis: ",  self.outrasleis
+
         
     def split_leis(self, texto):
         """
@@ -60,7 +63,7 @@ class BuscaLeis:
         """
         Parseia cada lei classificando em Lei Federal, Estadual e Municipal 
         """
-        rawstr = r""">*\s*([A-Z]{2,3}-[A-Z,0-9]*)|(CF)|("CAPUT")\s+"""
+        rawstr = r""">*\s*([A-Z]{2,3}\s*-\s*[A-Z,0-9]*)|(CF)|("CAPUT")\s+"""
         compile_obj = re.compile(rawstr)
         for p in pieces:
             match_obj = compile_obj.findall(p)
@@ -68,9 +71,9 @@ class BuscaLeis:
             for m in match_obj:
                 matches.append([i for i in m if i][0])
             if matches:
-                if matches[0] == 'LEG-FED':
+                if 'FED' in matches[0]:# == 'LEG-FED':
                     self.leisfed.append(matches)
-                elif matches[0] == 'LEG-EST':
+                elif 'EST' in matches[0]:# == 'LEG-EST':
 #                    print p
                     self.leisest.append(matches)
                 elif matches[0] == 'LEG-MUN':
@@ -79,8 +82,11 @@ class BuscaLeis:
                 elif matches[0] == 'LEG-DIS':
 #                    print p
                     self.leisdis.append(matches)
+                elif matches[0] == 'LEG-INT':
+#                    print p
+                    self.leisint.append(matches)
                 else:
-                    print p
+#                    print p,  matches[0]
                     self.outrasleis.append(matches)
 #        print "texto: ", p
 #        print "matches: ", matches
@@ -115,6 +121,9 @@ def extrai_dados(cursor,  inicio,  num):
         sopa = BeautifulSoup(d[0].strip('[]'),  fromEncoding='IBM855')
 #        print sopa.originalEncoding
         # Tag contendo informacao de UF
+        tipo  = d[1]
+        data_p = d[2]
+        data_d = d[3]
         c = sopa.strong
         uf = busca_UF(c.contents[0])
 #        print uf
@@ -127,12 +136,13 @@ def extrai_dados(cursor,  inicio,  num):
         rs  = sopa.findAll('strong', text=re.compile('^Legisla'))
         if rs:
             l = rs[0].next.nextSibling
-            print len(l.contents)
+#            print len(l.contents)
             legs = BuscaLeis(l.contents[0])
+            
     print "Falhas em Extracao de UFs: ",  num-len(UFs)
 #        print unicode(c),  type(c)
     
 if __name__ == "__main__":
     pass
 #    print conta_campos(cur)
-    extrai_dados(cur,  0, 200)
+    extrai_dados(cur,  5000, 1000)
