@@ -7,7 +7,7 @@ from elixir import *
 metadata.bind = "mysql://root:password@E04324/STF_Analise_Decisao"
 metadata.bind.echo = True
 
-class WriteToDb:
+class SalvaNoBanco:
     """
     Salva os dados no banco
     """
