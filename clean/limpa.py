@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import difflib
 import re
 import json
@@ -6,6 +7,21 @@ from collections import defaultdict
 from BeautifulSoup import BeautifulSoup
 import MySQLdb
 from salva import *
+=======
+import json
+import re
+from collections import defaultdict
+
+import MySQLdb
+from BeautifulSoup import BeautifulSoup
+
+from salva import *
+
+
+#from sqlalchemy.ext.sqlsoup import SqlSoup
+#db = SqlSoup('mysql://root:password@emapserv/Supremo')
+#print db.t_decisoes.all()
+>>>>>>> cc726ff65e08ba1bacdf3a9fe1cd984cc9a74785
 
 #Configura conexoes
 #db = SqlSoup('mysql://root:password@emapserv/Supremo')
@@ -79,12 +95,18 @@ class BuscaLeis:
                 matches.append([i for i in m if i][0])
             if matches:
                 if 'FED' in matches[0]:# == 'LEG-FED':
+                    matches[0] = 'LEG-FED'
                     self.data['LEG-FED'].append(matches)
                 elif 'EST' in matches[0]:# == 'LEG-EST':
 #                    print p
+                    matches[0] = 'LEG-EST'
                     self.data['LEG-EST'].append(matches)
                 elif matches[0] == 'LEG-MUN':
 #                    print p
+                    self.data['LEG-MUN'].append(matches)
+                elif matches[0] == 'LEG-MUM':
+#                    print p
+                    matches[0] = 'LEG-MUN'
                     self.data['LEG-MUN'].append(matches)
                 elif matches[0] == 'LEG-DIS':
 #                    print p
@@ -143,18 +165,20 @@ def extrai_dados(cursor,  inicio,  num):
     Constroi nova tabela com Datas, Estado e leis referenciadas
     cursor ...
     """
-    cursor.execute('select decisao,tipo,data_publicacao,data_decisao from t_decisoes limit %s,%s'%(inicio, num))
+    cursor.execute('select decisao,tipo,data_publicacao,data_decisao, id_processo from t_decisoes limit %s,%s'%(inicio, num))
     dados = cursor.fetchmany(num)
     UFs = []
     legs = BuscaLeis()
     for d in dados:
+        tipo  = d[1] #tipo da decisao: acordao, etc.
+        data_p = d[2] #data de publicacao
+        data_d = d[3] #data da decisao
+        processo = d[4] # id do processo
+        
         sopa = BeautifulSoup(d[0].strip('[]'),  fromEncoding='IBM855')
 #        print sopa.originalEncoding
-        # Tag contendo informacao de UF
-        tipo  = d[1]
-        data_p = d[2]
-        data_d = d[3]
         c = sopa.strong
+        # Tag contendo informacao de UF
         uf = busca_UF(c.contents[0])
 #        print uf
         if uf:
@@ -167,7 +191,7 @@ def extrai_dados(cursor,  inicio,  num):
         if rs:
             l = rs[0].next.nextSibling
 #            print len(l.contents)
-            print legs.analisa(l.contents[0])
+            ljson = legs.analisa(l.contents[0])
             
     print "Falhas em Extracao de UFs: ",  num-len(UFs)
 #        print unicode(c),  type(c)
