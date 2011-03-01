@@ -50,8 +50,7 @@ class SalvaNoBanco:
         except IndexError:#caso em que ano nao esta especificado
             ano = 0
         if ano !=0:
-            int(ano.split('-')[1])
-        print D
+            ano = int(ano.split('-')[1])
         LEI = Lei(esfera=esfera, lei=lei, ano=ano, decisao=D)
         if  len(L) <3:
             return
@@ -71,7 +70,8 @@ class SalvaNoBanco:
                     if not inc: inc=None
                     l = Letra(inciso=inc, letra=i.split('-')[1])
                 else:
-                    print i
+                    pass
+#                    print i
             except ValueError:
                 print "ValueError: ", i
             except:
