@@ -1,6 +1,7 @@
-
+# -*- coding:utf-8 -*-
 import difflib
 import re
+import locale
 import json
 from collections import defaultdict
 #from sqlalchemy.ext.sqlsoup import SqlSoup
@@ -55,7 +56,7 @@ class BuscaLeis:
         """
         d = self.data
         self.data = defaultdict(lambda:[])
-        return json.dumps(dict(d))
+        return json.dumps(dict(d), ensure_ascii=False)
         
     def split_leis(self, texto):
         """
@@ -78,13 +79,16 @@ class BuscaLeis:
         """
         Parseia cada lei classificando em Lei Federal, Estadual e Municipal 
         """
-        rawstr = r""">*\s*([A-Z]{2,3}\s*-\s*[A-Z,0-9]*)|(CF)|("CAPUT")\s+"""
-        compile_obj = re.compile(rawstr)
+        locale.setlocale(locale.LC_ALL, 'pt_BR.ISO-8859-1') 
+        rawstr = r""">*\s*([A-Z]{2,3}\s*-\s*.[A-Z0-9]*)|(CF)|("CAPUT")\s+"""
+        compile_obj = re.compile(rawstr, re.LOCALE)
         for p in pieces:
             match_obj = compile_obj.findall(p)
             matches = []
             for m in match_obj:
                 matches.append([i for i in m if i][0])
+            if 'PAR-' in matches:
+                print p
             if matches:
                 if 'FED' in matches[0]:# == 'LEG-FED':
                     matches[0] = 'LEG-FED'
@@ -127,34 +131,7 @@ def conta_campos(cursor):
 #TODO: contar ocorrencias usando defaultdict
         campos.update(cs)
     return campos
-    
-def classifica_lei():
-    gabarito = {"esfera": {"LEG-INT":["LEG-INT", ], 
-                                          "LEG-FED":["LEG-FED", 
-                                                             "CF", 
-                                                             "CF-", 
-                                                             "CONSTITUIÇÃO FEDERAL",
-                                                             "EMC"
-                                                             ], 
-                                          "LEG-EST":["LEG-EST"],
-                                          "LEG-MUN":["LEG-MUN"],
-                                          "LEG-DIS":["LEG-DIS"]
-                                          }, 
-                        "lei": ["CF", "CF-", "CONSTITUIÇÃO FEDERAL",  "EMC-", 
-                                    "LEI-",
-                                    "RGI",  "STF-",  "RISTF-",  "REGIMENTO INTERNO DO SUPREMO TRIBUNAL FEDERAL", 
-                                    "SUM-", 
-                                    "DEL-",
-                                    "CPP-",  "CÓDIGO DE PROCESSO PENAL", 
-                                    "CPC-",  "CÓDIGO DE PROCESSO CIVIL", 
-                                    "ADCT"
-                                    ], 
-                        "ano": ["ANO-"], 
-                        "artigo": ["ART-"],
-                        "inciso": ["INC-"], 
-                        "paragrafo": ["PAR-",  "PARÁGRAFO ÚNICO",  "PARAGRAFO UNICO"], 
-                        "letra": ["LET-"]
-                     }
+
 
 def extrai_dados(cursor,  inicio,  num):
     """
@@ -165,13 +142,14 @@ def extrai_dados(cursor,  inicio,  num):
     dados = cursor.fetchmany(num)
     UFs = []
     legs = BuscaLeis()
+    salva = SalvaNoBanco()
     for d in dados:
         tipo  = d[1] #tipo da decisao: acordao, etc.
         data_p = d[2] #data de publicacao
         data_d = d[3] #data da decisao
         processo = d[4] # id do processo
         
-        sopa = BeautifulSoup(d[0].strip('[]'),  fromEncoding='IBM855')
+        sopa = BeautifulSoup(d[0].strip('[]'),  fromEncoding='ISO8859-1')
 #        print sopa.originalEncoding
         c = sopa.strong
         # Tag contendo informacao de UF
@@ -188,7 +166,8 @@ def extrai_dados(cursor,  inicio,  num):
             l = rs[0].next.nextSibling
 #            print len(l.contents)
             ljson = legs.analisa(l.contents[0])
-            
+            salva.salvar(data_d, data_p, tipo, processo, uf, ljson)
+    salva.commit_data()
     print "Falhas em Extracao de UFs: ",  num-len(UFs)
 #        print unicode(c),  type(c)
     
