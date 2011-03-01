@@ -7,20 +7,23 @@ from collections import defaultdict
 #from sqlalchemy.ext.sqlsoup import SqlSoup
 from BeautifulSoup import BeautifulSoup
 import MySQLdb
+from MySQLdb.cursors import CursorUseResultMixIn,  SSCursor
+#inicializa tabelas analiticas
 from salva import *
+setup_all(True)
+create_all()
 
 
 
 #from sqlalchemy.ext.sqlsoup import SqlSoup
 #db = SqlSoup('mysql://root:password@emapserv/Supremo')
 #print db.t_decisoes.all()
-
-
 #Configura conexoes
 #db = SqlSoup('mysql://root:password@emapserv/Supremo')
 #print db.t_decisoes.all()
+
 db=MySQLdb.connect(host="E04324", user="root", passwd="password",db="Supremo")
-cur=db.cursor()
+cur=db.cursor(cursorclass=SSCursor) #SSCursor mantem os resultados no servidor trazendo um resultados por vez. Essencial para que a consulta caiba na memoria.
 
 
 def busca_UF(texto):
@@ -139,11 +142,13 @@ def extrai_dados(cursor,  inicio,  num):
     cursor ...
     """
     cursor.execute('select decisao,tipo,data_publicacao,data_decisao, id_processo from t_decisoes limit %s,%s'%(inicio, num))
-    dados = cursor.fetchmany(num)
+#    dados = cursor.fetchmany(num)
     UFs = []
     legs = BuscaLeis()
     salva = SalvaNoBanco()
-    for d in dados:
+    n=0;
+    d=cursor.fetchone() # usando Fetchone para economizar memoria
+    while d != None:
         tipo  = d[1] #tipo da decisao: acordao, etc.
         data_p = d[2] #data de publicacao
         data_d = d[3] #data da decisao
@@ -167,11 +172,19 @@ def extrai_dados(cursor,  inicio,  num):
 #            print len(l.contents)
             ljson = legs.analisa(l.contents[0])
             salva.salvar(data_d, data_p, tipo, processo, uf, ljson)
+            if not n%500:
+                print "Foram processadas %s decisoes"%n
+                salva.commit_data()
+        d = cursor.fetchone()
+        n +=1
     salva.commit_data()
+    print "Leis Diferentes: ",  salva.outrasleis
     print "Falhas em Extracao de UFs: ",  num-len(UFs)
+    cursor.close()
 #        print unicode(c),  type(c)
     
 if __name__ == "__main__":
     pass
 #    print conta_campos(cur)
-    extrai_dados(cur,  5000, 1000)
+    extrai_dados(cur,  0, 1000000)
+    db.close()
