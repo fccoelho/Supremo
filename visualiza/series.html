@@ -1,0 +1,23 @@
+
+<script type='text/javascript' src='http://www.google.com/jsapi'></script>
+  <script type='text/javascript'>
+   google.load('visualization', '1', {'packages': ['annotatedtimeline']});
+   google.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+      var data = new google.visualization.DataTable({{json|safe}},'0.5');
+
+      var options = {};
+      options['displayAnnotations'] = true;
+
+
+      var container = document.getElementById('atseries');
+      var chart = new google.visualization.AnnotatedTimeLine(container);
+      chart.draw(data, options);
+    };
+  
+</script>
+
+<h3>{{title}}</h3>
+<div id="atseries" style="width:700px;height:240px;"></div>
+
