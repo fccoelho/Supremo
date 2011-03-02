@@ -98,13 +98,14 @@ class SalvaNoBanco:
             except:
                 print "Unexpected error:", sys.exc_info()[0]
         
-    def salvar(self, datadec, datapub, tipo, processo, UF, leisjson):
+    def salvar(self, datadec, datapub, tipo, processo, UF, leisjson, proc_classe, relator, duracao, origem):
         """
         salva no banco 
         """
         leisjson = json.loads(leisjson.decode('iso-8859-1'))
 #        print leisjson.items()
-        D = Decisao(processo=processo, tipo=tipo, data_dec=datadec, data_pub=datapub, UF=UF)
+        D = Decisao(processo=processo, tipo=tipo, data_dec=datadec, data_pub=datapub, 
+                    UF=UF, proc_classe = proc_classe, relator=relator, duracao=duracao, origem=origem)
         for k, v in leisjson.iteritems(): #itera sobre as esferas citadas: Federal, Estadual, etc
             for l in v: # Itera sobre as leis citadas na dada esfera.
                 self.parse_partes_leis(D, l)
@@ -118,6 +119,10 @@ class Decisao(Entity):
     using_options(tablename='decisao')
     processo = Field(Integer)
     tipo = Field(Unicode(45))
+    proc_classe = Field(Unicode(128))
+    relator = Field(Unicode(256))
+    duracao = Field(Integer)
+    origem = Field(Unicode(128))
     data_dec = Field(Date)
     data_pub = Field(Date)
     UF = Field(Unicode(2))

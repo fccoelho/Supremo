@@ -7,7 +7,7 @@ from collections import defaultdict
 #from sqlalchemy.ext.sqlsoup import SqlSoup
 from BeautifulSoup import BeautifulSoup
 import MySQLdb
-from MySQLdb.cursors import CursorUseResultMixIn,  SSCursor
+from MySQLdb.cursors import CursorUseResultMixIn,  DictCursor, SSDictCursor
 #inicializa tabelas analiticas
 from salva import *
 setup_all(True)
@@ -23,7 +23,7 @@ create_all()
 #print db.t_decisoes.all()
 
 db=MySQLdb.connect(host="E04324", user="root", passwd="password",db="Supremo")
-cur=db.cursor(cursorclass=SSCursor) #SSCursor mantem os resultados no servidor trazendo um resultados por vez. Essencial para que a consulta caiba na memoria.
+cur=db.cursor(cursorclass=SSDictCursor) #SSCursor mantem os resultados no servidor trazendo um resultados por vez. Essencial para que a consulta caiba na memoria.
 
 
 def busca_UF(texto):
@@ -141,7 +141,7 @@ def extrai_dados(cursor,  inicio,  num):
     Constroi nova tabela com Datas, Estado e leis referenciadas
     cursor ...
     """
-    cursor.execute('select decisao,tipo,data_publicacao,data_decisao, id_processo from t_decisoes limit %s,%s'%(inicio, num))
+    cursor.execute('SELECT * FROM Supremo.t_decisoes  LEFT JOIN Supremo.t_processos ON Supremo.t_decisoes.id_processo=Supremo.t_processos.id_processo limit %s,%s;'%(inicio, num))
 #    dados = cursor.fetchmany(num)
     UFs = []
     legs = BuscaLeis()
@@ -149,12 +149,13 @@ def extrai_dados(cursor,  inicio,  num):
     n=0;
     d=cursor.fetchone() # usando Fetchone para economizar memoria
     while d != None:
-        tipo  = d[1] #tipo da decisao: acordao, etc.
-        data_p = d[2] #data de publicacao
-        data_d = d[3] #data da decisao
-        processo = d[4] # id do processo
+        tipo  = d['tipo'] #tipo da decisao: acordao, etc.
+        data_p = d['data_publicacao'] #data de publicacao
+        data_d = d['data_decisao'] #data da decisao
+        processo = d['id_processo'] # id do processo
         
-        sopa = BeautifulSoup(d[0].strip('[]'),  fromEncoding='ISO8859-1')
+        
+        sopa = BeautifulSoup(d['decisao'].strip('[]'),  fromEncoding='ISO8859-1')
 #        print sopa.originalEncoding
         c = sopa.strong
         # Tag contendo informacao de UF
@@ -169,9 +170,8 @@ def extrai_dados(cursor,  inicio,  num):
         rs  = sopa.findAll('strong', text=re.compile('^Legisla'))
         if rs:
             l = rs[0].next.nextSibling
-#            print len(l.contents)
             ljson = legs.analisa(l.contents[0])
-            salva.salvar(data_d, data_p, tipo, processo, uf, ljson)
+            salva.salvar(data_d, data_p, tipo, processo, uf, ljson, d['proc_classe'], d['relator'], d['duracao_dias'], d['origem_tribunal'])
             if not n%500:
                 print "Foram processadas %s decisoes"%n
                 salva.commit_data()
@@ -181,7 +181,6 @@ def extrai_dados(cursor,  inicio,  num):
     print "Leis Diferentes: ",  salva.outrasleis
     print "Falhas em Extracao de UFs: ",  num-len(UFs)
     cursor.close()
-#        print unicode(c),  type(c)
     
 if __name__ == "__main__":
     pass
