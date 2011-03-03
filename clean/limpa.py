@@ -10,21 +10,16 @@ import MySQLdb
 from MySQLdb.cursors import CursorUseResultMixIn,  DictCursor, SSDictCursor
 #inicializa tabelas analiticas
 from salva import *
-setup_all(True)
-create_all()
 
-
-
-#from sqlalchemy.ext.sqlsoup import SqlSoup
-#db = SqlSoup('mysql://root:password@emapserv/Supremo')
-#print db.t_decisoes.all()
-#Configura conexoes
-#db = SqlSoup('mysql://root:password@emapserv/Supremo')
-#print db.t_decisoes.all()
 
 db=MySQLdb.connect(host="E04324", user="root", passwd="password",db="Supremo")
-cur=db.cursor(cursorclass=DictCursor) #SSCursor mantem os resultados no servidor trazendo um resultados por vez. Essencial para que a consulta caiba na memoria.
+cur=db.cursor(cursorclass=SSDictCursor) #SSCursor mantem os resultados no servidor trazendo um resultados por vez. Essencial para que a consulta caiba na memoria.
 
+
+
+def inicializa_banco_destino():
+    setup_all(True)
+    create_all()
 
 def busca_UF(texto):
     """
@@ -189,5 +184,7 @@ def extrai_dados(cursor,  inicio,  num):
 if __name__ == "__main__":
     pass
 #    print conta_campos(cur)
+    inicializa_banco_destino()
+#    setup_all()
     extrai_dados(cur,  0, 373000)
     db.close()
