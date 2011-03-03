@@ -23,7 +23,7 @@ create_all()
 #print db.t_decisoes.all()
 
 db=MySQLdb.connect(host="E04324", user="root", passwd="password",db="Supremo")
-cur=db.cursor(cursorclass=SSDictCursor) #SSCursor mantem os resultados no servidor trazendo um resultados por vez. Essencial para que a consulta caiba na memoria.
+cur=db.cursor(cursorclass=DictCursor) #SSCursor mantem os resultados no servidor trazendo um resultados por vez. Essencial para que a consulta caiba na memoria.
 
 
 def busca_UF(texto):
@@ -141,49 +141,53 @@ def extrai_dados(cursor,  inicio,  num):
     Constroi nova tabela com Datas, Estado e leis referenciadas
     cursor ...
     """
-    cursor.execute('SELECT * FROM Supremo.t_decisoes  LEFT JOIN Supremo.t_processos ON Supremo.t_decisoes.id_processo=Supremo.t_processos.id_processo limit %s,%s;'%(inicio, num))
-#    dados = cursor.fetchmany(num)
     UFs = []
     legs = BuscaLeis()
     salva = SalvaNoBanco()
     n=0;
-    d=cursor.fetchone() # usando Fetchone para economizar memoria
-    while d != None:
-        tipo  = d['tipo'] #tipo da decisao: acordao, etc.
-        data_p = d['data_publicacao'] #data de publicacao
-        data_d = d['data_decisao'] #data da decisao
-        processo = d['id_processo'] # id do processo
-        
-        
-        sopa = BeautifulSoup(d['decisao'].strip('[]'),  fromEncoding='ISO8859-1')
-#        print sopa.originalEncoding
-        c = sopa.strong
-        # Tag contendo informacao de UF
-        uf = busca_UF(c.contents[0])
-#        print uf
-        if uf:
-            UFs.append(uf)
-        else:
-            UFs.append('NA')
+    while inicio < num:# fazendo selects parciais para evitar problemas de memoria
+        cursor.execute('SELECT * FROM Supremo.t_decisoes  LEFT JOIN Supremo.t_processos ON Supremo.t_decisoes.id_processo=Supremo.t_processos.id_processo limit %s,%s;'%(inicio, 1000))
+    #    dados = cursor.fetchmany(num)
+        d=cursor.fetchone() # usando Fetchone para economizar memoria
+        while d != None:
+            tipo  = d['tipo'] #tipo da decisao: acordao, etc.
+            data_p = d['data_publicacao'] #data de publicacao
+            data_d = d['data_decisao'] #data da decisao
+            processo = d['id_processo'] # id do processo
+            
+            
+            sopa = BeautifulSoup(d['decisao'].strip('[]'),  fromEncoding='ISO8859-1')
+    #        print sopa.originalEncoding
+            c = sopa.strong
+            if not c:
+                print d['decisao']
+                continue
+            # Tag contendo informacao de UF
+            uf = busca_UF(c.contents[0])
+    #        print uf
+            if uf:
+                UFs.append(uf)
+            else:
+                UFs.append('NA')
 
-        # Tag contendo legislacao
-        rs  = sopa.findAll('strong', text=re.compile('^Legisla'))
-        if rs:
-            l = rs[0].next.nextSibling
-            ljson = legs.analisa(l.contents[0])
-            salva.salvar(data_d, data_p, tipo, processo, uf, ljson, d['proc_classe'], d['relator'], d['duracao_dias'], d['origem_tribunal'])
-            if not n%500:
-                print "Foram processadas %s decisoes"%n
-                salva.commit_data()
-        d = cursor.fetchone()
-        n +=1
-    salva.commit_data()
+            # Tag contendo legislacao
+            rs  = sopa.findAll('strong', text=re.compile('^Legisla'))
+            if rs:
+                l = rs[0].next.nextSibling
+                ljson = legs.analisa(l.contents[0])
+                salva.salvar(data_d, data_p, tipo, processo, uf, ljson, d['proc_classe'], d['relator'], d['duracao_dias'], d['origem_tribunal'])
+                if not n%200:
+                    print "Foram processadas %s decisoes"%n
+                    salva.commit_data()
+            d = cursor.fetchone()
+            n +=1
+        salva.commit_data()
+        inicio +=1000
     print "Leis Diferentes: ",  salva.outrasleis
     print "Falhas em Extracao de UFs: ",  num-len(UFs)
     cursor.close()
-    
 if __name__ == "__main__":
     pass
 #    print conta_campos(cur)
-    extrai_dados(cur,  0, 1000000)
+    extrai_dados(cur,  0, 373000)
     db.close()

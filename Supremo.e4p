@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Project SYSTEM "Project-4.6.dtd">
 <!-- eric4 project file for project Supremo -->
-<!-- Saved: 2011-03-02, 17:42:39 -->
+<!-- Saved: 2011-03-03, 11:06:17 -->
 <!-- Copyright (C) 2011 ,  -->
 <Project version="4.6">
   <Language>en</Language>
@@ -19,6 +19,7 @@
     <Source>visualiza/__init__.py</Source>
     <Source>visualiza/gviz_api.py</Source>
     <Source>visualiza/webviz.py</Source>
+    <Source>visualiza/viz.py</Source>
   </Sources>
   <Forms>
   </Forms>
