@@ -2,11 +2,16 @@
 """
 Modulo de visualização dos dados do supremo (decisões)
 """
-from sqlalchemy import create_engine, MetaData, Table
+from sqlalchemy import create_engine, MetaData, Table,  func,  join
 from sqlalchemy.orm import mapper, sessionmaker
 from collections import defaultdict
+import cPickle as cp
+import time
+import cProfile 
+import datetime
 
 from matplotlib import pyplot as P
+
 class Lei(object):
     pass
 class Decisao(object):
@@ -19,6 +24,28 @@ class Inciso(object):
     pass 
 class Letra(object):
     pass
+    
+def timeit(method):
+    """
+    Decorator to time methods (or functions)
+    """
+    def timed(*args, **kw):
+        ts = time.time()
+        result = method(*args, **kw)
+        te = time.time()
+
+        print '%r  %2.2f sec' % \
+              (method.__name__ , te-ts)
+        return result
+
+    return timed
+    
+def profileit(fun):
+    def timed(*args, **kw):
+        result = cProfile(fun(*args, **kw))
+        return result
+
+    return timed
 
 def loadSession():
     """faz a conexao com o banco e retorna uma sessao"""
@@ -37,15 +64,45 @@ def loadSession():
     Session = sessionmaker(bind=engine)
     session = Session()
     return session
+
+class AnalisaCitacoes:
+    def __init__(self, session):
+        self.session = session
+        self.freqs = self.calc_freq_lei(session)
+
+    @timeit
+    def calc_freq_lei(self, session):
+        lei_freq = session.query(func.count(Lei.lei), Lei.lei,  Lei.id).group_by(Lei.lei).all()
+        return sorted(lei_freq, key=lambda x:x[0],  reverse=True)
     
-def calc_freq_lei(session):
-    dq =  session.query(Decisao)
-    lei_freq = defaultdict(lambda:0)
-    for d in dq:
-        lei_freq[tuple(d.legislacao)] += 1
-    return lei_freq
+    def visualiza_freq_lei(self, freqs):
+        freqs = freqs[:100] #top 100
+        ind = range(len(freqs))
+        alturas = [i[0] for i in freqs]
+        xlabels = [i[1] for i in freqs]
+        P.bar(ind, alturas,  log=True)
+        P.show()
+    
+    @timeit
+    def alcance_temporal(self):
+        """
+        Retorna dicionario de decisoes co data da decisao e ano da lei mais antiga citada.
+        """
+        alc = {}
+        for d in self.session.query(Decisao.id, Decisao.data_dec, func.min(Lei.ano)).join((Lei, Decisao.id==Lei.decisao_id)).group_by(Decisao.id).all():
+            alc[d[0]] = d[1:]
+            
+        return alc
+    
+
 
 if __name__ == "__main__":
     S = loadSession()
 #    S.query(Lei).all()
-    print calc_freq_lei(S)[:10]
+    Ana = AnalisaCitacoes(S)
+#    Ana.visualiza_freq_lei(Ana.freqs)
+    alc = Ana.alcance_temporal()
+    print len(Ana.freqs)
+
+    
+
