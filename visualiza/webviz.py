@@ -1,6 +1,6 @@
 import gviz_api as GV 
 import jinja2
-import lebanco
+from lebanco import *
 
 
 def create_ts_data_source(cnames,data,types):

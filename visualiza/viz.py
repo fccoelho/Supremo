@@ -46,13 +46,14 @@ class AnalisaCitacoes:
         freqs = sorted(lei_freq, key=lambda x:x[0],  reverse=True)
     
         def visualiza(freqs):
-            freqs = freqs[:10] #top 10
+            freqs = freqs[:20] #top 10
             ind = range(len(freqs))
             alturas = [i[0] for i in freqs]
             xlabels = [i[1] for i in freqs]
             P.bar(ind, alturas,  log=True)
-            P.xticks(range(10),xlabels[:10],rotation=45,size='x-small')
-            P.title(u'Leis ordenadas por frequência de citação: top 10')
+            P.xticks(range(20),xlabels[:20],rotation=45,size='x-small')
+            P.title(u'Leis ordenadas por frequência de citação: top 20')
+            P.savefig('freq.png')
         if view:
             visualiza(freqs)
         return freqs
@@ -74,6 +75,9 @@ class AnalisaCitacoes:
             #print dados
             P.hist(dados,  log=True)
             P.title(u'Diferença em anos entre o ano da decisão e o da lei mais antiga citada')
+            P.xlabel('Anos')
+            P.ylabel(u'Decisões')
+            P.savefig('alcance.png')
         if view:
             visualiza(alc)
         return alc
@@ -90,7 +94,10 @@ class AnalisaCitacoes:
             "histograma"
             P.figure()
             P.hist(c.values(), log=True)
-            P.title('Numero de leis citadas')
+            P.title(u'Numero de leis citadas por decisão')
+            P.xlabel('numero de leis citadas')
+            P.ylabel(u'numero de Decisões')
+            P.savefig('complexidade.png')
         if view:
             visualiza(c)
         return c
