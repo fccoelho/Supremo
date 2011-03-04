@@ -1,4 +1,3 @@
-
 # -*- coding:utf-8 -*-
 """
 Modulo de visualização dos dados do supremo (decisões)
@@ -10,21 +9,10 @@ import cPickle as cp
 import time
 import cProfile 
 import datetime
+from lebanco import *
 
 from matplotlib import pyplot as P
 
-class Lei(object):
-    pass
-class Decisao(object):
-    pass 
-class Artigo(object):
-    pass 
-class Paragrafo(object):
-    pass 
-class Inciso(object):
-    pass 
-class Letra(object):
-    pass
     
 def timeit(method):
     """
@@ -47,24 +35,6 @@ def profileit(fun):
         return result
 
     return timed
-
-def loadSession():
-    """faz a conexao com o banco e retorna uma sessao"""
-    engine = create_engine("mysql://root:password@E04324/STF_Analise_Decisao", echo=False)
- 
-    metadata = MetaData(engine)
-    decisao = Table('decisao', metadata, autoload=True)
-    lei = Table('lei_decisao', metadata, autoload=True)
-    artigo = Table('artigo_lei', metadata, autoload=True)
-    paragrafo = Table('paragrafo_artigo', metadata, autoload=True)
-    inciso = Table('inciso_artigo', metadata, autoload=True)
-    letra = Table('letra_inciso', metadata, autoload=True)
-    
-    mapper(Lei, lei);mapper(Decisao, decisao);mapper(Artigo, artigo);mapper(Paragrafo, paragrafo);mapper(Inciso, inciso);mapper(Letra, letra)
- 
-    Session = sessionmaker(bind=engine)
-    session = Session()
-    return session
 
 class AnalisaCitacoes:
     def __init__(self, session):
@@ -103,7 +73,7 @@ class AnalisaCitacoes:
             dados  = [d for d in dados if d >0 and d<1000]
             #print dados
             P.hist(dados,  log=True)
-            P.title('Diferença em anos entre o ano da decisão e o da lei mais antiga citada')
+            P.title(u'Diferença em anos entre o ano da decisão e o da lei mais antiga citada')
         if view:
             visualiza(alc)
         return alc
@@ -126,7 +96,7 @@ class AnalisaCitacoes:
         return c
 
 if __name__ == "__main__":
-    S = loadSession()
+    S = cria_sessao()
 #    S.query(Lei).all()
     Ana = AnalisaCitacoes(S)
     Ana.calc_freq_lei(True)

@@ -1,3 +1,4 @@
+# -*- coding:utf-8 -*-
 """
 Módulo para acesso aos dados da tabela de decisões
 """
