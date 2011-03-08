@@ -1,0 +1,23 @@
+
+<script type='text/javascript' src='http://www.google.com/jsapi'></script>
+  <script type='text/javascript'>
+   google.load('visualization', '1', {'packages': ['motionchart']})
+   google.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+      var data = new google.visualization.DataTable({{json|safe}},'0.5');
+
+      var options = {width: 600, height:300};
+      options['displayAnnotations'] = true;
+
+
+      var container = document.getElementById('mchart');
+      var chart = new google.visualization.MotionChart(container);
+      chart.draw(data, options);
+    };
+  
+</script>
+
+<h3>{{title}}</h3>
+<div id="mchart" style="width:600px;height:300px;"></div>
+
