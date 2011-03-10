@@ -81,6 +81,10 @@ class AnalisaCitacoes:
         if view:
             visualiza(alc)
         return alc
+        
+    def espacial(self,  view=False):
+        """
+        generates a 
 
     @timeit
     def complexidade1(self, view=False):
