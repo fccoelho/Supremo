@@ -12,6 +12,15 @@ import datetime
 from lebanco import *
 
 from matplotlib import pyplot as P
+import numpy as np
+from webviz import blob_map,  annot_TS
+
+#Cria dicionrio de coordenadas dos centroides dos estados
+centroides = {}
+with open('centroides_estados.csv', 'r') as f:
+    for s in f:
+        s = s.strip().split(',')
+        centroides[s[0]] = (float(s[1]), float(s[2]))
 
     
 def timeit(method):
@@ -82,9 +91,96 @@ class AnalisaCitacoes:
             visualiza(alc)
         return alc
         
+    @timeit
     def espacial(self,  view=False):
         """
-        generates a 
+        generates a blob map with counts decisions by state
+        """
+        lei_freq = self.session.query(func.count(Decisao), Decisao.data_dec, Decisao.UF).group_by(Decisao.UF).all()
+        freqs = sorted(lei_freq, key=lambda x:x[1],  reverse=False)
+        data = []
+        for p in freqs:
+            try:
+                data.append((centroides[p[2]][0], centroides[p[2]][1], p[0], p[2]))
+            except KeyError:
+                pass
+#                print p
+        mapa = blob_map('Decisoes por estado', 'br', data, 'numero')
+        with open('espacial.html', 'w') as f:
+            f.write(mapa)
+    
+    @timeit
+    def serie_esferas(self, view=True):
+        """
+        plota series temporais de citações por esfera
+        """
+        anodict = defaultdict(lambda:defaultdict(lambda:0))
+        leis = self.session.query(Lei.esfera, Lei.id,Lei.lei,  Decisao.data_dec).join((Decisao, Decisao.id==Lei.decisao_id)).all()
+        esferas = set([])
+        for l in leis:
+            if (not l[3]) or l[3].year <1900:
+                continue
+            anodict[l[3].year][l[0]] += 1
+            esferas.add(l[0])
+#        print len(leis),anodict.items()[:50]
+        t = anodict.keys()
+        t.sort()
+        series={}
+        for e in esferas:
+            series[e] = [anodict[i][e] for i in t]
+        def visualiza():
+            d = np.array(series.values()).T
+            P.plot(t, d)
+            P.legend(series.keys())
+#            P.gca().set_yscale('log')
+        html = annot_TS('Serie de citacoes', [datetime.date(i, 12, 31) for i in t], series.values(), series.keys())
+        with open('esf_series.html', 'w') as f:
+            f.write(html)
+        if view:
+            visualiza()
+            
+    @timeit
+    def evolucao_sumulas(self, view=True):
+        """
+        plota series temporais de citações por esfera
+        """
+        anodict = defaultdict(lambda:0) #contador de citacoes a sumulas
+        lfanodict = defaultdict(lambda:0) #contador de leis federais totais
+        sumulas = self.session.query(Lei.esfera, Lei.id,Lei.lei,  Decisao.data_dec).join((Decisao, Decisao.id==Lei.decisao_id)).filter(Lei.esfera=='LEG-FED').filter(Lei.lei.like('SUM%')).all()
+        leg_fed = self.session.query(Lei.esfera, Decisao.data_dec).join((Decisao, Decisao.id==Lei.decisao_id)).filter(Lei.esfera=='LEG-FED').all()
+        # Contagem de sumulas por ano
+        for l in sumulas:
+            if (not l[3]) or l[3].year <1900:
+                continue
+            anodict[l[3].year] += 1.
+            
+        # Contagem de leg-fed por ano
+        for l in leg_fed:
+            if (not l[1]) or l[1].year <1900:
+                continue
+            lfanodict[l[1].year] += 1.
+            
+        # Calcula proporcao
+        for a in anodict.keys():
+            anodict[a] /=lfanodict[a]
+
+        t = anodict.keys()
+        t.sort()
+        series={}
+        series['Sumula'] = [anodict[ano] for ano in t]
+        def visualiza():
+            d = np.array(series.values()).T
+            P.plot(t, d)
+            P.title(u'Citações a súmulas')
+            P.xlabel('ano')
+            P.ylabel(u'fração do total de citações a legislação federal')
+            P.legend(series.keys())
+#            P.gca().set_yscale('log')
+        html = annot_TS('Decisoes referenciando sumulas', [datetime.date(i, 12, 31) for i in t], series.values(), series.keys())
+        with open('evo_sumulas.html', 'w') as f:
+            f.write(html)
+        if view:
+            visualiza()
 
     @timeit
     def complexidade1(self, view=False):
@@ -110,10 +206,12 @@ if __name__ == "__main__":
     S = cria_sessao()
 #    S.query(Lei).all()
     Ana = AnalisaCitacoes(S)
-    Ana.calc_freq_lei(True)
-    alc = Ana.alcance_temporal(True)
-    Ana.complexidade1(True)
+#    Ana.calc_freq_lei(True)
+#    alc = Ana.alcance_temporal(True)
+#    Ana.complexidade1(True)
+
+
+    Ana.espacial(True)
+    #Ana.serie_esferas(True)
+    Ana.evolucao_sumulas(True)
     P.show()
-
-    
-

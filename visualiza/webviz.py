@@ -1,9 +1,9 @@
 import gviz_api as GV 
-from jinja2 import Environment, PackageLoader
+from jinja2 import Environment, FileSystemLoader, TemplateNotFound
 from lebanco import *
 import datetime
 
-env = Environment(loader=PackageLoader('Supremo', 'templates'))
+env = Environment(loader=FileSystemLoader( 'templates'))
 
 def gera_javascript_date(d):
     """
@@ -113,21 +113,25 @@ def annot_TS(title, dates, values, snames, anot=[], anot_text=[]):
         - `anot`: positions of annotations
         - `anot`: text of annotations
     '''
+    if isinstance(dates[0], int): #checking date format
+        dt = ['number']
+    else: 
+        dt = ['date']
+        
     cnames = ['Time']
     if anot:
         for n, s in enumerate(snames):
             cnames += [s, 'label%s'%n, 'text%s'%n]
         data = [dates]
-        types = ['date']+(['number', 'string','string']*len(snames))
+        types = dt+(['number', 'string','string']*len(snames))
         data += values +[anot]+[anot_text]
-#        for n, s in enumerate(values):
-#            data.extend([s, anot[n], anot_text[n]])
+
         data = zip(*data)
     else:
         cnames += snames
         data = [dates]+ values
         data = zip(*data)
-        types = ['date'] +(['number']*len(values))
+        types = dt +(['number']*len(values))
     data_table = create_ts_data_source(cnames, data, types)
     json = data_table.ToJSon(columns_order=cnames, order_by=cnames[1])
     template = env.get_template('series.html')
