@@ -145,6 +145,7 @@ def extrai_dados(cursor,  inicio,  num):
     #    dados = cursor.fetchmany(num)
         d=cursor.fetchone() # usando Fetchone para economizar memoria
         while d != None:
+            n +=1
             tipo  = d['tipo'] #tipo da decisao: acordao, etc.
             data_p = d['data_publicacao'] #data de publicacao
             data_d = d['data_decisao'] #data da decisao
@@ -175,7 +176,6 @@ def extrai_dados(cursor,  inicio,  num):
                     print "Foram processadas %s decisoes"%n
                     salva.commit_data()
             d = cursor.fetchone()
-            n +=1
         salva.commit_data()
         inicio +=1000
     print "Leis Diferentes: ",  salva.outrasleis

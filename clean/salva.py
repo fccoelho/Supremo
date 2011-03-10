@@ -17,11 +17,11 @@ class SalvaNoBanco:
     def __init__(self):
         self.outrasleis = set([])
         self.gabarito = {"esfera": ["LEG-INT", "LEG-FED", "LEG-EST","LEG-MUN","LEG-DIS", ], 
-                                "lei": ["CF", "CF-", "CONSTITUIÇÃO FEDERAL",  "EMC-", 
+                                "lei": ["CF", "CF-", u"CONSTITUIÇÃO FEDERAL",  "EMC-", 
                                             "LEI-","LEI", 
                                             "RGI",  "STF-",  "RISTF-",  "REGIMENTO INTERNO DO SUPREMO TRIBUNAL FEDERAL", 
                                             "CPP-",  "CÓDIGO DE PROCESSO PENAL", 
-                                            "CPC-",  "CÓDIGO DE PROCESSO CIVIL", 
+                                            "CPC-",  u"CÓDIGO DE PROCESSO CIVIL", 
                                             "ADCT", "ADM", "ANT", "AVS", "AEX", "ADC", "ASR", "ATO", "AIT", "ACP", "ACT","ATR","ADN", 
                                             "CLT", "CTA", "CMS", "COM","CNV", "CVC","CIR","CES","CPM-",
                                             "PRT", "PRV", "PRS", "PRI","PRC", "PTR", "PRO", 
@@ -40,7 +40,7 @@ class SalvaNoBanco:
                         "ano": ["ANO-"], 
                         "artigo": ["ART-", "ATR", "CAPUT"],
                         "inciso": ["INC-"], 
-                        "paragrafo": ["PAR-",  "PARÁGRAFO ÚNICO",  "PARAGRAFO UNICO"], 
+                        "paragrafo": ["PAR-",u"PARÁGRAFO ÚNICO",  "PARAGRAFO UNICO"], 
                         "letra": ["LET-"]
                      }
 
@@ -55,6 +55,7 @@ class SalvaNoBanco:
         ano =None
         if esfera == 'outras':
             print "==> outras esferas :",  L[0]
+        lei = ""
         try:
             lei = L[1] if  sum((L[1].startswith(i) for i in self.gabarito['lei']))>0 else None
             if not lei:
@@ -93,8 +94,8 @@ class SalvaNoBanco:
                 else:
                     pass
 #                    print i
-            except ValueError:
-                print "ValueError: ", i
+            except ValueError, e:
+                print "ValueError: ", i, e
             except:
                 print "Unexpected error:", sys.exc_info()[0]
         
