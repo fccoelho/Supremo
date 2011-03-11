@@ -52,21 +52,23 @@ class SalvaNoBanco:
         
         #determina esfera
         esfera = L[0] if L[0] in self.gabarito['esfera'] else'outras'
-        ano =None
+        ano =0
         if esfera == 'outras':
             print "==> outras esferas :",  L[0]
-        lei = ""
+        #lei = ""
         try:
             lei = L[1] if  sum((L[1].startswith(i) for i in self.gabarito['lei']))>0 else None
             if not lei:
                 if L[1].startswith('ANO-'):
-                    ano = int(L[1].split('-')[1])
+                    try:
+                        ano = int(L[1].split('-')[1])
+                    except ValueError:
+                        ano = 0
                 else:
                     self.outrasleis.add(L[1].split('-')[0])
         except IndexError: #caso em que lei nao esta especificada
             lei = L[0]
-        except ValueError:
-            ano = 0
+
         try:
             ano = int(L[2].split('-')[1]) if sum((L[2].startswith(i) for i in self.gabarito['ano']))>0 else 0
         except IndexError:#caso em que ano nao esta especificado

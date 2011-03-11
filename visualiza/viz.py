@@ -162,8 +162,10 @@ class AnalisaCitacoes:
         """
         plota series temporais de citações por esfera
         """
+        #select esfera, lei_decisao.id, lei, DATE_FORMAT(decisao.data_dec,'%Y') AS year,count(*) FROM lei_decisao JOIN decisao ON decisao.id = lei_decisao.decisao_id WHERE lei like '%SUM' GROUP BY year(decisao.data_dec), lei_decisao.esfera;
         anodict = defaultdict(lambda:0) #contador de citacoes a sumulas
         lfanodict = defaultdict(lambda:0) #contador de leis federais totais
+#        sumulas_ano = self.session.query("esfera", "id","lei", "Decisao.data_dec").from_statement("select esfera, id, lei, DATE_FORMAT(decisao.data_dec,'%Y') AS year FROM Lei JOIN Decisao ON Decisao.id = Lei.decisao_id WHERE Lei.lei like 'SUM%' GROUP BY year(decisao.data_dec), Lei.esfera")
         sumulas = self.session.query(Lei.esfera, Lei.id,Lei.lei,  Decisao.data_dec).join((Decisao, Decisao.id==Lei.decisao_id)).filter(Lei.esfera=='LEG-FED').filter(Lei.lei.like('SUM%')).all()
         leg_fed = self.session.query(Lei.esfera, Decisao.data_dec).join((Decisao, Decisao.id==Lei.decisao_id)).filter(Lei.esfera=='LEG-FED').all()
         # Contagem de sumulas por ano
@@ -232,5 +234,5 @@ if __name__ == "__main__":
     Ana.espacial(True)
     Ana.tab_cont(True)
     #Ana.serie_esferas(True)
-#    Ana.evolucao_sumulas(True)
+    Ana.evolucao_sumulas(True)
 #    P.show()
