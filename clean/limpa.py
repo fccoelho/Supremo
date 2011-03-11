@@ -141,7 +141,9 @@ def extrai_dados(cursor,  inicio,  num):
     salva = SalvaNoBanco()
     n=0;
     while inicio < num:# fazendo selects parciais para evitar problemas de memoria
-        cursor.execute('SELECT * FROM Supremo.t_decisoes  LEFT JOIN Supremo.t_processos ON Supremo.t_decisoes.id_processo=Supremo.t_processos.id_processo limit %s,%s;'%(inicio, 1000))
+        cursor.execute('SELECT t_decisoes.id,t_decisoes.tipo, t_decisoes.data_publicacao, t_decisoes.data_decisao, t_decisoes.id_processo, t_decisoes.decisao,\
+                        t_processos.proc_classe, t_processos.relator, t_processos.duracao_dias, t_processos.origem_tribunal \
+        FROM t_decisoes LEFT JOIN t_processos ON t_decisoes.id_processo=t_processos.id_processo limit %s,%s;'%(inicio, 1000))
     #    dados = cursor.fetchmany(num)
         d=cursor.fetchone() # usando Fetchone para economizar memoria
         while d != None:
@@ -156,7 +158,9 @@ def extrai_dados(cursor,  inicio,  num):
     #        print sopa.originalEncoding
             c = sopa.strong
             if not c:
-                print d['decisao']
+                print n, d['id'],d['decisao']
+                d = cursor.fetchone()
+                print '==> Encontrada decisao em branco no registro %s'%n
                 continue
             # Tag contendo informacao de UF
             uf = busca_UF(c.contents[0])

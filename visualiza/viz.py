@@ -5,6 +5,7 @@ Modulo de visualização dos dados do supremo (decisões)
 from sqlalchemy import create_engine, MetaData, Table,  func,  join
 from sqlalchemy.orm import mapper, sessionmaker
 from collections import defaultdict
+from itertools import imap
 import cPickle as cp
 import time
 import cProfile 
@@ -66,6 +67,23 @@ class AnalisaCitacoes:
         if view:
             visualiza(freqs)
         return freqs
+    
+    @timeit
+    def tab_cont(self, view=True):
+        """
+        Exemplo de tabela de contingência
+        """
+        table = self.session.query(Decisao.UF, Decisao.tipo, func.count(Decisao)).group_by(Decisao.UF, Decisao.tipo).all()
+        def pprint_table():
+            colnames = list(set([i[1] for i in table]))
+            rows = defaultdict(lambda:[0]*len(colnames))
+            for r in table:
+                rows[r[0]][colnames.index(r[1])] = r[2]
+            print colnames, 'total'
+            for rn, r in rows.items():
+                print rn, r, sum(r)
+        if view:
+            pprint_table()
 
     @timeit
     def alcance_temporal(self, view=False):
@@ -212,6 +230,7 @@ if __name__ == "__main__":
 
 
     Ana.espacial(True)
+    Ana.tab_cont(True)
     #Ana.serie_esferas(True)
-    Ana.evolucao_sumulas(True)
-    P.show()
+#    Ana.evolucao_sumulas(True)
+#    P.show()
