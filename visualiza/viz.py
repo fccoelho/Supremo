@@ -134,7 +134,7 @@ class AnalisaCitacoes:
         """
         anodict = defaultdict(lambda:{})
         leis = self.session.query("esfera", "year", 'sumcits').from_statement("select esfera, DATE_FORMAT(decisao.data_dec,'%Y') AS year, count(*) as sumcits FROM lei_decisao JOIN decisao ON decisao.id = lei_decisao.decisao_id GROUP BY year(decisao.data_dec), esfera").all()
-        print leis
+#        print leis
         for l in leis:
             if (not l[1]) or int(l[1])<1900:
                 continue #quando ano não esta especificado, i.e., ==None
@@ -144,15 +144,9 @@ class AnalisaCitacoes:
         for d in anodict.itervalues():
             esferas += d.keys()
         esferas = list(set(esferas))
-#        for l in leis:
-#            if (not l[3]) or l[3].year <1900:
-#                continue
-#            anodict[l[3].year][l[0]] += 1
-#            esferas.add(l[0])
-##        print len(leis),anodict.items()[:50]
+
         t = anodict.keys()
         t.sort()
-#        series = np.zeros((len(t), len(esferas)))
         series = dict([(e, []) for e in esferas])
         for e in esferas:
             for y in t:
