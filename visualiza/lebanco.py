@@ -20,7 +20,7 @@ class Letra(object):
 
 def cria_sessao():
     """faz a conexao com o banco e retorna uma sessao"""
-    engine = create_engine("mysql://root:password@E04324/STF_Analise_Decisao", echo=True)
+    engine = create_engine("mysql://root:password@E04324/STF_Analise_Decisao", echo=False)
  
     metadata = MetaData(engine)
     decisao = Table('decisao', metadata, autoload=True)

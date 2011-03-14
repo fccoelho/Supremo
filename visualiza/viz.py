@@ -132,24 +132,42 @@ class AnalisaCitacoes:
         """
         plota series temporais de citações por esfera
         """
-        anodict = defaultdict(lambda:defaultdict(lambda:0))
-        leis = self.session.query(Lei.esfera, Lei.id,Lei.lei,  Decisao.data_dec).join((Decisao, Decisao.id==Lei.decisao_id)).all()
-        esferas = set([])
+        anodict = defaultdict(lambda:{})
+        leis = self.session.query("esfera", "year", 'sumcits').from_statement("select esfera, DATE_FORMAT(decisao.data_dec,'%Y') AS year, count(*) as sumcits FROM lei_decisao JOIN decisao ON decisao.id = lei_decisao.decisao_id GROUP BY year(decisao.data_dec), esfera").all()
+        print leis
         for l in leis:
-            if (not l[3]) or l[3].year <1900:
-                continue
-            anodict[l[3].year][l[0]] += 1
-            esferas.add(l[0])
-#        print len(leis),anodict.items()[:50]
+            if (not l[1]) or int(l[1])<1900:
+                continue #quando ano não esta especificado, i.e., ==None
+            anodict[int(l[1])][l[0]]= l[2]
+#        leis = self.session.query(Lei.esfera, Lei.id,Lei.lei,  Decisao.data_dec).join((Decisao, Decisao.id==Lei.decisao_id)).all()
+        esferas = []
+        for d in anodict.itervalues():
+            esferas += d.keys()
+        esferas = list(set(esferas))
+#        for l in leis:
+#            if (not l[3]) or l[3].year <1900:
+#                continue
+#            anodict[l[3].year][l[0]] += 1
+#            esferas.add(l[0])
+##        print len(leis),anodict.items()[:50]
         t = anodict.keys()
         t.sort()
-        series={}
+#        series = np.zeros((len(t), len(esferas)))
+        series = dict([(e, []) for e in esferas])
         for e in esferas:
-            series[e] = [anodict[i][e] for i in t]
+            for y in t:
+                if e in anodict[y]:
+                    series[e].append(anodict[y][e])
+                else:
+                    series[e].append(np.nan)
         def visualiza():
             d = np.array(series.values()).T
-            P.plot(t, d)
+            P.plot(t, d, ':o')
             P.legend(series.keys())
+            P.title(u'Citações a Legislação')
+            P.xlabel('ano')
+            P.ylabel(u'total de citações')
+            P.gca().set_yscale('log')
 #            P.gca().set_yscale('log')
         html = annot_TS('Serie de citacoes', [datetime.date(i, 12, 31) for i in t], series.values(), series.keys())
         with open('esf_series.html', 'w') as f:
@@ -162,40 +180,35 @@ class AnalisaCitacoes:
         """
         plota series temporais de citações por esfera
         """
-        #select esfera, lei_decisao.id, lei, DATE_FORMAT(decisao.data_dec,'%Y') AS year,count(*) FROM lei_decisao JOIN decisao ON decisao.id = lei_decisao.decisao_id WHERE lei like '%SUM' GROUP BY year(decisao.data_dec), lei_decisao.esfera;
-        anodict = defaultdict(lambda:0) #contador de citacoes a sumulas
-        lfanodict = defaultdict(lambda:0) #contador de leis federais totais
-#        sumulas_ano = self.session.query("esfera", "id","lei", "Decisao.data_dec").from_statement("select esfera, id, lei, DATE_FORMAT(decisao.data_dec,'%Y') AS year FROM Lei JOIN Decisao ON Decisao.id = Lei.decisao_id WHERE Lei.lei like 'SUM%' GROUP BY year(decisao.data_dec), Lei.esfera")
-        sumulas = self.session.query(Lei.esfera, Lei.id,Lei.lei,  Decisao.data_dec).join((Decisao, Decisao.id==Lei.decisao_id)).filter(Lei.esfera=='LEG-FED').filter(Lei.lei.like('SUM%')).all()
-        leg_fed = self.session.query(Lei.esfera, Decisao.data_dec).join((Decisao, Decisao.id==Lei.decisao_id)).filter(Lei.esfera=='LEG-FED').all()
+        sumulas_ano = self.session.query("llei", "year", 'sumcits').from_statement("select LEFT(lei,3) as llei, DATE_FORMAT(decisao.data_dec,'%Y') AS year, count(*) as sumcits FROM lei_decisao JOIN decisao ON decisao.id = lei_decisao.decisao_id WHERE lei_decisao.lei like 'SUM%' GROUP BY year(decisao.data_dec)").all()
+#        print sumulas_ano
+#        sumulas = self.session.query(Lei.esfera, Lei.id,Lei.lei, Decisao.data_dec).join((Decisao, Decisao.id==Lei.decisao_id)).filter(Lei.esfera=='LEG-FED').filter(Lei.lei.like('SUM%')).all()
+        leg_fed = self.session.query("esfera", "year", 'sumcits').from_statement("select esfera, DATE_FORMAT(decisao.data_dec,'%Y') AS year, count(*) as sumcits FROM lei_decisao JOIN decisao ON decisao.id = lei_decisao.decisao_id WHERE lei_decisao.esfera= 'LEG-FED' GROUP BY year(decisao.data_dec)").all()
+#        leg_fed = self.session.query(Lei.esfera, Decisao.data_dec).join((Decisao, Decisao.id==Lei.decisao_id)).filter(Lei.esfera=='LEG-FED').all()
         # Contagem de sumulas por ano
-        for l in sumulas:
-            if (not l[3]) or l[3].year <1900:
-                continue
-            anodict[l[3].year] += 1.
-            
+#        print leg_fed
+        anodict = dict([(int(l[1]), l[2]) for l in sumulas_ano if l[1]])
+
         # Contagem de leg-fed por ano
-        for l in leg_fed:
-            if (not l[1]) or l[1].year <1900:
-                continue
-            lfanodict[l[1].year] += 1.
+        lfanodict = dict([(int(l[1]), l[2]) for l in leg_fed if l[1]])
             
         # Calcula proporcao
         for a in anodict.keys():
-            anodict[a] /=lfanodict[a]
+            anodict[a] /=float(lfanodict[a])
 
         t = anodict.keys()
         t.sort()
         series={}
         series['Sumula'] = [anodict[ano] for ano in t]
         def visualiza():
+            P.figure()
             d = np.array(series.values()).T
-            P.plot(t, d)
+            P.plot(t, d, ':o')
             P.title(u'Citações a súmulas')
             P.xlabel('ano')
             P.ylabel(u'fração do total de citações a legislação federal')
             P.legend(series.keys())
-#            P.gca().set_yscale('log')
+            P.gca().set_yscale('log')
         html = annot_TS('Decisoes referenciando sumulas', [datetime.date(i, 12, 31) for i in t], series.values(), series.keys())
         with open('evo_sumulas.html', 'w') as f:
             f.write(html)
@@ -232,7 +245,7 @@ if __name__ == "__main__":
 
 
     Ana.espacial(True)
-    Ana.tab_cont(True)
-    #Ana.serie_esferas(True)
+    #Ana.tab_cont(True)
+    Ana.serie_esferas(True)
     Ana.evolucao_sumulas(True)
-#    P.show()
+    P.show()
