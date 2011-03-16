@@ -156,8 +156,9 @@ class AnalisaCitacoes:
                     series[e].append(np.nan)
         def visualiza():
             d = np.array(series.values()).T
+            P.figure()
             P.plot(t, d, ':o')
-            P.legend(series.keys())
+            P.legend(series.keys(),  loc=0)
             P.title(u'Citações a Legislação')
             P.xlabel('ano')
             P.ylabel(u'total de citações')
@@ -169,6 +170,7 @@ class AnalisaCitacoes:
         if view:
             visualiza()
             
+    
     @timeit
     def evolucao_sumulas(self, view=True):
         """
@@ -202,7 +204,7 @@ class AnalisaCitacoes:
             P.xlabel('ano')
             P.ylabel(u'fração do total de citações a legislação federal')
             P.legend(series.keys())
-            P.gca().set_yscale('log')
+#            P.gca().set_yscale('log')
         html = annot_TS('Decisoes referenciando sumulas', [datetime.date(i, 12, 31) for i in t], series.values(), series.keys())
         with open('evo_sumulas.html', 'w') as f:
             f.write(html)
@@ -228,18 +230,35 @@ class AnalisaCitacoes:
         if view:
             visualiza(c)
         return c
-
+        
+    @timeit
+    def complexidade_duracao(self,  view=False):
+        c = {}
+        for d in self.session.query(Decisao.id, Decisao.duracao, func.count(Lei)).join((Lei, Decisao.id==Lei.decisao_id)).group_by(Decisao.id).all():
+            c[d[0]] = (d[1], d[2])
+        data = np.array(c.values())
+        def visualiza():
+            P.figure()
+            P.plot(data[:, 0], data[:, 1], 'o')
+            P.title("Duracao vs complexidade")
+            P.xlabel('Duracao')
+            P.ylabel('Numero de Leis Citadas')
+            P.savefig('Duracao_x_complexidade.png')
+        if view:
+            visualiza()
+            
 if __name__ == "__main__":
     S = cria_sessao()
 #    S.query(Lei).all()
     Ana = AnalisaCitacoes(S)
-#    Ana.calc_freq_lei(True)
+    Ana.calc_freq_lei(True)
 #    alc = Ana.alcance_temporal(True)
 #    Ana.complexidade1(True)
 
 
     Ana.espacial(True)
     #Ana.tab_cont(True)
+    Ana.complexidade_duracao(True)
     Ana.serie_esferas(True)
     Ana.evolucao_sumulas(True)
     P.show()
