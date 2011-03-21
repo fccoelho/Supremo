@@ -176,10 +176,10 @@ class AnalisaCitacoes:
         """
         plota series temporais de citações por esfera
         """
-        sumulas_ano = self.session.query("llei", "year", 'sumcits').from_statement("select LEFT(lei,3) as llei, DATE_FORMAT(decisao.data_dec,'%Y') AS year, count(*) as sumcits FROM lei_decisao JOIN decisao ON decisao.id = lei_decisao.decisao_id WHERE lei_decisao.lei like 'SUM%' GROUP BY year(decisao.data_dec)").all()
+        sumulas_ano = self.session.query("llei", "year", 'sumcits').from_statement("select LEFT(lei,3) as llei, DATE_FORMAT(decisao.data_dec,'%Y') AS year, count(*) as sumcits FROM lei_decisao JOIN decisao ON decisao.id = lei_decisao.decisao_id WHERE lei_decisao.lei like 'SUM%' AND year(decisao.data_dec) > 1900 GROUP BY year(decisao.data_dec)").all()
 #        print sumulas_ano
 #        sumulas = self.session.query(Lei.esfera, Lei.id,Lei.lei, Decisao.data_dec).join((Decisao, Decisao.id==Lei.decisao_id)).filter(Lei.esfera=='LEG-FED').filter(Lei.lei.like('SUM%')).all()
-        leg_fed = self.session.query("esfera", "year", 'sumcits').from_statement("select esfera, DATE_FORMAT(decisao.data_dec,'%Y') AS year, count(*) as sumcits FROM lei_decisao JOIN decisao ON decisao.id = lei_decisao.decisao_id WHERE lei_decisao.esfera= 'LEG-FED' GROUP BY year(decisao.data_dec)").all()
+        leg_fed = self.session.query("esfera", "year", 'sumcits').from_statement("select esfera, DATE_FORMAT(decisao.data_dec,'%Y') AS year, count(*) as sumcits FROM lei_decisao JOIN decisao ON decisao.id = lei_decisao.decisao_id WHERE year(decisao.data_dec) > 1900 GROUP BY year(decisao.data_dec)").all()
 #        leg_fed = self.session.query(Lei.esfera, Decisao.data_dec).join((Decisao, Decisao.id==Lei.decisao_id)).filter(Lei.esfera=='LEG-FED').all()
         # Contagem de sumulas por ano
 #        print leg_fed
@@ -189,8 +189,8 @@ class AnalisaCitacoes:
         lfanodict = dict([(int(l[1]), l[2]) for l in leg_fed if l[1]])
             
         # Calcula proporcao
-        for a in anodict.keys():
-            anodict[a] /=float(lfanodict[a])
+#        for a in anodict.keys():
+#            anodict[a] /=float(lfanodict[a])
 
         t = anodict.keys()
         t.sort()
@@ -234,7 +234,7 @@ class AnalisaCitacoes:
     @timeit
     def complexidade_duracao(self,  view=False):
         c = {}
-        for d in self.session.query(Decisao.id, Decisao.duracao, func.count(Lei)).join((Lei, Decisao.id==Lei.decisao_id)).group_by(Decisao.id).all():
+        for d in self.session.query(Decisao.id, Decisao.duracao, func.count(Lei)).join((Lei, Decisao.id==Lei.decisao_id)).filter(Decisao.data_dec > datetime.date(1900,1,1)).group_by(Decisao.id).all():
             c[d[0]] = (d[1], d[2])
         data = np.array(c.values())
         def visualiza():
@@ -247,18 +247,39 @@ class AnalisaCitacoes:
         if view:
             visualiza()
             
+    @timeit
+    def artigos_mais_citados(self,  view=False):
+        """
+        Artigos mais citados agrupados por constituiçao
+        """
+        art_freq = self.session.query(Artigo.numero, func.count(Artigo), Lei.lei,  Lei.ano).join((Lei, Artigo.lei_id==Lei.id)).filter(Lei.ano != None).filter(Lei.ano>1900).filter(Lei.lei=='CF').group_by(Lei.ano, Artigo.numero).all()
+#        print art_freq[:10],  len(art_freq)
+        freqs = sorted(art_freq, key=lambda x:x[1],  reverse=True)
+        def visualiza(freqs):
+            freqs = freqs[:50] #top 10
+            ind = range(len(freqs))
+            alturas = [i[1] for i in freqs]
+            xlabels = ['Art. %s CF-%s'%(i[0], i[3]) for i in freqs]
+            P.bar(ind, alturas,  log=True)
+            P.xticks(np.arange(50)-.5,xlabels[:50],rotation=60,size='x-small')
+            P.title(u'Artigos mais citados da constituição: top 50')
+            P.savefig('art_freq.png')
+        if view:
+            visualiza(freqs)
+        
 if __name__ == "__main__":
     S = cria_sessao()
 #    S.query(Lei).all()
     Ana = AnalisaCitacoes(S)
-    Ana.calc_freq_lei(True)
+#    Ana.calc_freq_lei(True)
 #    alc = Ana.alcance_temporal(True)
 #    Ana.complexidade1(True)
 
 
-    Ana.espacial(True)
+#    Ana.espacial(True)
     #Ana.tab_cont(True)
-    Ana.complexidade_duracao(True)
-    Ana.serie_esferas(True)
-    Ana.evolucao_sumulas(True)
+#    Ana.complexidade_duracao(True)
+#    Ana.serie_esferas(True)
+#    Ana.evolucao_sumulas(True)
+    Ana.artigos_mais_citados(True)
     P.show()
