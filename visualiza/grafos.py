@@ -35,6 +35,7 @@ def cf88_vs_outras(nedges):
     res = Q.fetchmany(nedges)#[0]
     G.add_weighted_edges_from(res)
     nx.draw(G)
+    P.savefig('grafo_cf_vs_outras_%s.png'%nedges)
 
 
 if __name__=="__main__":
