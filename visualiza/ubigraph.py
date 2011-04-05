@@ -2,7 +2,7 @@ import xmlrpclib
 
 class Ubigraph:
   def __init__(self, URL='http://127.0.0.1:20738/RPC2'):
-    self.server = xmlrpclib.Server(URL)
+    self.server = xmlrpclib.Server(URL, allow_none=1)
     self.server_backup = self.server
     self.defaultVertexStyle = VertexStyle(self, None, id=0)
     self.defaultEdgeStyle = EdgeStyle(self, None, id=0)

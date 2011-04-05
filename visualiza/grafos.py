@@ -6,7 +6,7 @@ Created on 05/04/2011
 '''
 import networkx as nx
 import xmlrpclib
-import os
+import os, time
 from sqlalchemy.ext.sqlsoup import SqlSoup
 import numpy as np
 import matplotlib.pyplot as P
@@ -38,15 +38,16 @@ order by
 def dyn_graph(nedges):
     """
     Visualização dinâmica usando ubigraph
-    Servidor Ubigraph deve estar rodando
+    Servidor Ubigraph deve estar rodando na URL indicada
     """
-    U = ubigraph.Ubigraph(URL='e04324:20738/RPC2')
+    U = ubigraph.Ubigraph(URL='http://10.250.46.208:20738/RPC2')
     U.clear()
-    cf_style = U.newVertex(id=0,shape="sphere", color="#ffff00")
-    lei_style = U.newVertexStyle(id=1,shape="sphere", color="#ff0000")
+    cf_style = U.newVertex(id=0,shape="cube", color="#ffff00")
+    lei_style = U.newVertexStyle(id=1,shape="cube", color="#ff0000")
     Q = dbgrafo.execute(cf88_vs_outras_q)
     res = np.array(Q.fetchmany(nedges))
     nodes = {}
+    #U.beginMultiCall()
     for e in res:
         #print e, e[0],e[1],e[2]
         if e[0] not in nodes:
@@ -61,8 +62,14 @@ def dyn_graph(nedges):
             n2 = nodes[e[1]]
         es = e[2]/max(res[:,2])
         U.newEdge(n1,n2,spline=False,strength=es, width=str(es))
+        #time.sleep(.05)
+    #U.endMultiCall()
 
 def cf88_vs_outras(nedges):
+    """
+    Desenha grafo via networkx
+    para grafos pequenos.
+    """
     G = nx.DiGraph()
     Q = dbgrafo.execute(cf88_vs_outras_q)
     res = Q.fetchmany(nedges)#[0]
