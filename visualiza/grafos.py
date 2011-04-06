@@ -35,7 +35,8 @@ order by
   count(ld_1.lei_id) desc
 """
 
-def dyn_graph(nedges):
+
+def dyn_graph(elist):
     """
     Visualização dinâmica usando ubigraph
     Servidor Ubigraph deve estar rodando na URL indicada
@@ -44,9 +45,11 @@ def dyn_graph(nedges):
     U.clear()
     cf_style = U.newVertex(id=0,shape="cube", color="#ffff00")
     lei_style = U.newVertexStyle(id=1,shape="cube", color="#ff0000")
-    Q = dbgrafo.execute(cf88_vs_outras_q)
-    res = np.array(Q.fetchmany(nedges))
+    #Q = dbgrafo.execute(cf88_vs_outras_q)
+    res = np.array(elist)
     nodes = {}
+    #print res[0]
+    maxw = float(max(res[:,2])) #largest weight
     #U.beginMultiCall()
     for e in res:
         #print e, e[0],e[1],e[2]
@@ -60,7 +63,7 @@ def dyn_graph(nedges):
             nodes[e[1]] = n2
         else:
             n2 = nodes[e[1]]
-        es = e[2]/max(res[:,2])
+        es = e[2]/maxw
         U.newEdge(n1,n2,spline=False,strength=es, width=str(es))
         #time.sleep(.05)
     #U.endMultiCall()
@@ -75,14 +78,37 @@ def cf88_vs_outras(nedges):
     res = Q.fetchmany(nedges)#[0]
     G.add_weighted_edges_from(res)
     nx.draw(G)
-    nx.draw_graphviz(G, "fdp")
+    #nx.draw_graphviz(G, "fdp")
     nx.write_dot(G, 'grafo_cf_vs_outras_%s.dot'%nedges)
     P.savefig('grafo_cf_vs_outras_%s.png'%nedges)
+    return G
 
-
+def lei_vs_lei(nedges=None):
+    """
+    Grafo de todas com todas
+    """
+    Q = dbgrafo.execute('select lei_id_1,lei_id_2, peso from gr_lei_lei')
+    if not nedges:
+        res = Q.fetchall()
+        nedges = len(res)
+    else:
+        res = Q.fetchmany(nedges)
+    G = nx.DiGraph()
+    #eds = [i[:3] for i in res]
+    G.add_weighted_edges_from(res)
+    nx.draw_random(G)
+    #nx.draw_graphviz(G, "fdp")
+    nx.write_dot(G, 'grafo_lei_vs_lei_%s.dot'%nedges)
+    P.savefig('grafo_lei_vs_lei_%s.png'%nedges)
+    return G,res
+    
 if __name__=="__main__":
     dbgrafo = SqlSoup("mysql://root:password@E04324/SEN_Grafo")
     dbdec = SqlSoup("mysql://root:password@E04324/STF_Analise_Decisao")
     #cf88_vs_outras(500)
-    dyn_graph(1000)
+    #dyn_graph(1000)
+    G,elist = lei_vs_lei(10000)
+    #print G.edges()
     P.show()
+    dyn_graph(elist)
+    
