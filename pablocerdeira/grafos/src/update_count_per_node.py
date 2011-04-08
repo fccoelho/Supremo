@@ -36,12 +36,6 @@ while i < cursor.rowcount-2:
         sqlstr = "update gr_lei_lei set count_lei = " + str(j) + " where edge_id = " + str(id)
         print sqlstr
         '''
-        A linha abaixo executa, mas trava o script. 
-        A execução fica travada no MySQLdb/cursors.py linha 282.
-        282 > self._do_get_result()
-        Por alguma razão quando ele executa a query ele fica travado.
-        Deve ser algum bug no meu MySQLdb.
-        Flávio, você poderia tentar rodar por ai, por favor?
         ''' 
         cursor2.execute(sqlstr)
     else:
