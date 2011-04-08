@@ -1,18 +1,15 @@
 # -*- coding:utf-8 -*-
 import MySQLdb
-import MySQLdb.cursors
-# o MySQLdb.cursor permite o uso de server side queries
 
-conn = MySQLdb.connect (host = "E04324", 
+conn = MySQLdb.connect (host = "E04324.fgv.br", 
                         user = "pablo",
                         passwd = "pablo",
-                        db = "SEN_Grafo",
-                        cursorclass = MySQLdb.cursors.SSCursor
+                        db = "SEN_Grafo"
                         )
    
 cursor = conn.cursor()
 
-conn2 = MySQLdb.connect (host = "E04324", 
+conn2 = MySQLdb.connect (host = "E04324.fgv.br", 
                         user = "pablo",
                         passwd = "pablo",
                         db = "SEN_Grafo"
@@ -42,7 +39,7 @@ while i < cursor.rowcount-2:
         282 > self._do_get_result()
         Por alguma razão quando ele executa a query ele fica travado.
         Deve ser algum bug no meu MySQLdb.
-        Fl�vio, voc� poderia tentar rodar por ai, por favor?
+        Flávio, você poderia tentar rodar por ai, por favor?
         ''' 
         cursor2.execute(sqlstr)
     else:
