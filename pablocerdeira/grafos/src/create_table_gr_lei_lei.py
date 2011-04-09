@@ -95,7 +95,11 @@ while i < cursor1.rowcount-1:
 print "Montagem da SqlStr concluída"
 print "Iniciando o send da query"
 cursor2.execute(sqlstr)
-print "Concluído!!!"
+print '''
+    Concluído no Python. 
+    Provavelmente ainda está rodando no servidor MySQL.
+    Verifique a conclusão rodando o comando 'show processlist'
+    '''
 
 cursor.close()
 
