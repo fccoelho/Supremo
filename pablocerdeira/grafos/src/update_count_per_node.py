@@ -14,7 +14,7 @@ para cada lei_id_1
 O código SQL para a seleção é:
 
 select * from gr_lei_lei
-where lei_count < 10
+where lei_count <= 10
 
 Onde 10 é o número de relações mais relevantes a retornar
 
