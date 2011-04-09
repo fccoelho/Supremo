@@ -1,4 +1,30 @@
 # -*- coding:utf-8 -*-
+'''
+Script para incluir um indicdor de ordem de relevância
+nas relações lei - lei na tabela gr_lei_lei
+
+A tabela encontra-se ordenada:
+    1o. por id da coluna lei_id_1
+    2o. pela quantidade de relações com a lei_id_2
+    
+Incluíndo um indicador (lei_count) na relação
+podemos filtrar apenas pelas n leis mais relevantes
+para cada lei_id_1
+
+O código SQL para a seleção é:
+
+select * from gr_lei_lei
+where lei_count < 10
+
+Onde 10 é o número de relações mais relevantes a retornar
+
+O valor pode ir de 0 a 100 na atual configuração do script.
+
+Autores:
+    Pablo Cerdeira
+    Flávio Coelho
+
+'''
 import MySQLdb
 
 '''
