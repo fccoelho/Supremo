@@ -28,13 +28,6 @@ Autores:
 import MySQLdb
 
 '''
-Usando duas conexões com o banco de dados.
-A primeira é para o select e a segunda para os updates.
-Não sei se é necessário usarmos as duas agora porque
-não estamos mais fazendo o select usando server side.
-
-Nota: fazer o teste com apenas uma conexão.
-
 O cursor server side (SSCursor) foi retirado porque 
 estava apresentando erros com o update no Mac e no 
 Windows, apesar de rodar bem no Linux durante algum 
@@ -49,18 +42,18 @@ conn = MySQLdb.connect (host = "E04324.fgv.br",
    
 cursor = conn.cursor()
 
-conn2 = MySQLdb.connect (host = "E04324.fgv.br", 
-                        user = "pablo",
-                        passwd = "pablo",
-                        db = "SEN_Grafo"
-                        )
-
-cursor2 = conn2.cursor()
+cursor2 = conn.cursor()
 
 '''
-Este select pega o conteúdo da tabela que será atualizada.
+Limpando o campo lei_count na tabela gr_lei_lei para atualizações
 '''
-cursor.execute("select edge_id, lei_id_1, lei_id_2, lei_count from gr_lei_lei")
+cursor.execute("update gr_lei_lei set lei_count = null;")
+
+
+'''
+Pegando conteúdo da tabela que será atualizada.
+'''
+cursor.execute("select edge_id, lei_id_1, lei_id_2 from gr_lei_lei;")
 
 print "Iniciando fetch"
 '''
@@ -95,33 +88,42 @@ Loop para percorrer todos os resultados da tabela gr_lei_lei
 Será executado enquanto a variável i for menor que o total
 de itens da tabela - 2.
 '''
+sqlstr = ""
 while i < cursor.rowcount-2:
     ''' 
     Setando variáveis para o resultado do primeiro valor de gr_lei_lei 
     '''
-    id, lei_1, lei_2, c = cursor.fetchone()
+    id, lei_1, lei_2 = cursor.fetchone()
     ''' 
     Na primeira iteração, seta lei_atual para o lei_1.
     Isso será utilizado para saber quando há mudança para a lei seguinte.
     '''
     lei_atual = lei_1
+    ''' 
+    Obrigatoriamente no primeiro loop lei_antiga (vale 0) != lei_atual 
+    '''    
     if lei_atual != lei_antiga:
-        ''' 
-        Obrigatoriamente no primeiro loop lei_antiga (vale 0) != lei_atual 
         '''
-        lei_antiga = lei_atual
-        j = 1
+        Se len(sqlstr) > 2 então não estamos mais no primeiro loop.
+        Portanto, vamos executar todos os scripts sql anteriores de uma única vez.
+        '''
+        if len(sqlstr) > 2:
+            print "Enviando updates para o MySQL da lei_id %s..." % str(lei_atual)
+            cursor2.execute(sqlstr)
+            print "Concluído o update da lei_id %s" % str(lei_atual)
+
         ''' 
         Setamos lei_antiga = lei_atual para que na próxima iteração este if == False
         Setamos j = 1 para inserir como valor de lei_count
         '''
-        # print i, "Lei id 1: ", lei_1, "Lei id 2", lei_2
+        lei_antiga = lei_atual
+        j = 1
         '''
-        Faz o update da primeira entrada para o lei_id_1 atual
+        Cria o script de update da primeira entrada para o lei_id_1 atual
         '''
-        sqlstr = "update gr_lei_lei set lei_count = %s where edge_id = %s"%(str(j),str(id))
-        print sqlstr
-        cursor2.execute(sqlstr)
+        sqlstr = "update gr_lei_lei set lei_count = %s where edge_id = %s; "%(str(j),str(id))
+        # print sqlstr
+        # cursor2.execute(sqlstr)
     elif j <= 100:
         '''
         Este elif é chamado a partir da segunda iteração do loop, quando
@@ -131,30 +133,30 @@ while i < cursor.rowcount-2:
         A função deste limitador é otimizar o script para que ele não 
         coloque marcador de ordem que nunca utilizaremos.
         '''
-        j += 1
         '''
-        Incrementamos j para controle usar como marcadores de ordem seguintes.
-        '''
-        # print i, "Lei id 1: ", lei_1, "Lei id 2", lei_2
-        '''
-        Fazendo o update da tabela, inserindo o valor atual de j.
-        '''
-        sqlstr = "update gr_lei_lei set lei_count = %s where edge_id = %s"% (str(j),str(id))
-        print sqlstr
-        cursor2.execute(sqlstr)
-    else:
-        '''
-        Válvula de escape do loop quando lei_antiga ainda igual a lei_atual e
-        j > 100.
-        Parmanecerá entrando neste bloco até lei_atual != lei_antiga.
-        O incremento de j aqui é desnecessário, utilizado apenas para controle
-        da execução durante a depuração.
+        Incrementamos j para usar como marcadores de ordem seguintes.
         '''
         j += 1
+        '''
+        Adicionando script à string sqlstr, inserindo o valor atual de j.
+        '''
+        sqlstr = sqlstr + "update gr_lei_lei set lei_count = %s where edge_id = %s; " % (str(j),str(id))
+        # print sqlstr
+        # cursor2.execute(sqlstr)
     i += 1
     '''
     Incrementamos i para contagem da quantidade de vezes que o loop foi executado.
     '''
+
+'''
+Faz um check para a última sqlstr.
+Se len(sqlstr) > 2 então ela tem query a ser executada.
+'''
+if len(sqlstr) > 2:
+    print "Enviando updates para o MySQL da lei_id %s..." % str(lei_atual)
+    cursor2.execute(sqlstr)
+    print "Concluído o update da lei_id %s" % str(lei_atual)
+        
 '''
 Fecha cursor e conexão.
 '''
