@@ -1,7 +1,6 @@
 # -*- coding:utf-8 -*-
 '''
 Script para criar e popular a tabela gr_lei_lei
-
 Tabela gr_lei_lei
     Responsável por armazenar as relações entre cada lei
     citada nas decisões do STF com as demais leis citadas 
@@ -40,8 +39,13 @@ cursor1 = conn.cursor()
 cursor2 = conn.cursor()
 
 '''
-Script para criar a tabela gr_lei_lei
+Script para dropar se necessário e criar a tabela gr_lei_lei
 '''
+print "Dropando a tabela gr_lei_lei se ela existir"
+sqlstr = '''
+DROP TABLE IF EXISTS gr_lei_lei;
+'''
+cursor1.execute(sqlstr)
 print "Criando a tabela gr_lei_lei"
 sqlstr = '''
 CREATE  TABLE gr_lei_lei (
@@ -101,6 +105,6 @@ print '''
     Verifique a conclusão rodando o comando 'show processlist'
     '''
 
-cursor.close()
-
+cursor1.close()
+cursor2.close()
 conn.close()
