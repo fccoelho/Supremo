@@ -152,8 +152,6 @@ def extrai_dados(cursor,  inicio,  num):
             data_p = d['data_publicacao'] #data de publicacao
             data_d = d['data_decisao'] #data da decisao
             processo = d['id_processo'] # id do processo
-            
-            
             sopa = BeautifulSoup(d['decisao'].strip('[]'),  fromEncoding='ISO8859-1')
     #        print sopa.originalEncoding
             c = sopa.strong
@@ -175,9 +173,9 @@ def extrai_dados(cursor,  inicio,  num):
             if rs:
                 l = rs[0].next.nextSibling
                 ljson = legs.analisa(l.contents[0])
-                salva.salvar(data_d, data_p, tipo, processo, uf, ljson, d['proc_classe'], d['relator'], d['duracao_dias'], d['origem_tribunal'])
+                salva.salvar(data_d, data_p, tipo, processo, uf, ljson, d['proc_classe'], d['relator'], d['duracao_dias'], d['origem_tribunal'], d['id'])
                 if not n%200:
-                    print "Foram processadas %s decisoes"%n
+                    print "Foram processadas %s decisoes\r"%(n, ), 
                     salva.commit_data()
             d = cursor.fetchone()
         salva.commit_data()
@@ -190,5 +188,5 @@ if __name__ == "__main__":
 #    print conta_campos(cur)
     inicializa_banco_destino()
 #    setup_all()
-    extrai_dados(cur,  0, 373000)
+    extrai_dados(cur, 0, 373000)
     db.close()

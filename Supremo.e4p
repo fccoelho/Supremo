@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Project SYSTEM "Project-4.6.dtd">
 <!-- eric4 project file for project Supremo -->
-<!-- Saved: 2011-03-11, 13:47:02 -->
+<!-- Saved: 2011-04-11, 09:42:10 -->
 <!-- Copyright (C) 2011 ,  -->
 <Project version="4.6">
   <Language>en</Language>
@@ -21,6 +21,8 @@
     <Source>visualiza/webviz.py</Source>
     <Source>visualiza/viz.py</Source>
     <Source>visualiza/lebanco.py</Source>
+    <Source>visualiza/ubigraph.py</Source>
+    <Source>visualiza/grafos.py</Source>
   </Sources>
   <Forms>
   </Forms>
