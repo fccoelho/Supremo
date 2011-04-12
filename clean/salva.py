@@ -2,7 +2,7 @@
 """
 Modulo para criar Tabela e salvar dados de decisoes do subremo
 """
-from elixir import *
+from elixir import ManyToOne, Date, Integer, OneToMany, Entity, using_options, Field, create_all, setup_all, metadata, session, Unicode
 import json
 import sys
 
@@ -19,8 +19,8 @@ class SalvaNoBanco:
         self.gabarito = {"esfera": ["LEG-INT", "LEG-FED", "LEG-EST","LEG-MUN","LEG-DIS", ], 
                                 "lei": ["CF", "CF-", u"CONSTITUIÇÃO FEDERAL",  "EMC-", 
                                             "LEI-","LEI", 
-                                            "RGI",  "STF-",  "RISTF-",  "REGIMENTO INTERNO DO SUPREMO TRIBUNAL FEDERAL", 
-                                            "CPP-",  "CÓDIGO DE PROCESSO PENAL", 
+                                            "RGI", "STF-",  "RISTF-",  "REGIMENTO INTERNO DO SUPREMO TRIBUNAL FEDERAL", 
+                                            "CPP-", "CÓDIGO DE PROCESSO PENAL", 
                                             "CPC-",  u"CÓDIGO DE PROCESSO CIVIL", 
                                             "ADCT", "ADM", "ANT", "AVS", "AEX", "ADC", "ASR", "ATO", "AIT", "ACP", "ACT","ATR","ADN", 
                                             "CLT", "CTA", "CMS", "COM","CNV", "CVC","CIR","CES","CPM-",
@@ -57,7 +57,7 @@ class SalvaNoBanco:
             print "==> outras esferas :",  L[0]
         #lei = ""
         try:
-            lei = L[1] if  sum((L[1].startswith(i) for i in self.gabarito['lei']))>0 else None
+            lei = L[1] if  sum((L[1].encode('utf8').startswith(i) for i in self.gabarito['lei']))>0 else None
             if not lei:
                 if L[1].startswith('ANO-'):
                     try:
@@ -101,13 +101,13 @@ class SalvaNoBanco:
             except:
                 print "Unexpected error:", sys.exc_info()[0]
         
-    def salvar(self, datadec, datapub, tipo, processo, UF, leisjson, proc_classe, relator, duracao, origem):
+    def salvar(self, datadec, datapub, tipo, processo, UF, leisjson, proc_classe, relator, duracao, origem, dec_id):
         """
         salva no banco 
         """
         leisjson = json.loads(leisjson.decode('iso-8859-1'))
 #        print leisjson.items()
-        D = Decisao(processo=processo, tipo=tipo, data_dec=datadec, data_pub=datapub, 
+        D = Decisao(id=dec_id, processo=processo, tipo=tipo, data_dec=datadec, data_pub=datapub, 
                     UF=UF, proc_classe = proc_classe, relator=relator, duracao=duracao, origem=origem)
         for k, v in leisjson.iteritems(): #itera sobre as esferas citadas: Federal, Estadual, etc
             for l in v: # Itera sobre as leis citadas na dada esfera.
@@ -119,6 +119,7 @@ class SalvaNoBanco:
 #===Modelos===
 
 class Decisao(Entity):
+    id = Field(Integer, primary_key=True,  required=True)
     using_options(tablename='decisao')
     processo = Field(Integer)
     tipo = Field(Unicode(45))
@@ -164,7 +165,6 @@ class Letra(Entity):
     using_options(tablename='letra_inciso')
     inciso  = ManyToOne('Inciso')
     letra = Field(Unicode(16))
-    
 
 if __name__=="__main__":
     setup_all(create_tables=True)
