@@ -110,6 +110,12 @@ while i < cursor.rowcount-2:
         if len(sqlstr) > 2:
             print "Enviando updates para o MySQL da lei_id %s..." % str(lei_atual)
             cursor2.execute(sqlstr)
+            '''
+            Adicionei um fechamento e uma nova abertura do cursor para evitar que
+            ele faça dois updates simultâneos, causando o erro 2014 no MySQL.
+            '''
+            cursor2.close()
+            cursor2 = conn.cursor()
             print "Concluído o update da lei_id %s" % str(lei_atual)
 
         ''' 

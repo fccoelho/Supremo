@@ -102,6 +102,7 @@ cursor2.execute(sqlstr)
 print '''
     Concluído no Python. 
     Provavelmente ainda está rodando no servidor MySQL.
+    A execução no lado do servidor levará aproximadamente 1 hora ainda.
     Verifique a conclusão rodando o comando 'show processlist'
     '''
 
