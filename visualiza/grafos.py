@@ -41,7 +41,10 @@ def dyn_graph(elist):
     Visualização dinâmica usando ubigraph
     Servidor Ubigraph deve estar rodando na URL indicada
     """
-    U = ubigraph.Ubigraph(URL='http://10.250.46.208:20738/RPC2')
+    # Versão Flávio
+    # U = ubigraph.Ubigraph(URL='http://10.250.46.208:20738/RPC2')
+    # Versão Pablo
+    U = ubigraph.Ubigraph(URL='http://127.0.0.1:20738/RPC2')
     U.clear()
     #cf_style = U.newVertex(id=0,shape="cube", color="#ffff00")
     lei_style = U.newVertexStyle(id=1,shape="cube", color="#ff0000")
@@ -111,8 +114,12 @@ def lei_vs_lei(nedges=None):
     return G,res
     
 if __name__=="__main__":
-    dbgrafo = SqlSoup("mysql://root:password@E04324/SEN_Grafo")
-    dbdec = SqlSoup("mysql://root:password@E04324/STF_Analise_Decisao")
+    # versão Flávio
+    # dbgrafo = SqlSoup("mysql://root:password@E04324/SEN_Grafo")
+    # dbdec = SqlSoup("mysql://root:password@E04324/STF_Analise_Decisao")
+    # versão Pablo
+    dbgrafo = SqlSoup("mysql://pablo:pablo@E04324.fgv.br/SEN_Grafo")
+    dbdec = SqlSoup("mysql://pablo:pablo@E04324.fgv.br/STF_Analise_Decisao")
     #cf88_vs_outras(500)
     #dyn_graph(1000)
     G,elist = lei_vs_lei()

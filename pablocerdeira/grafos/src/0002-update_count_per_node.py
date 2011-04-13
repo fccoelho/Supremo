@@ -124,21 +124,6 @@ while i < cursor.rowcount-2:
         '''
         lei_antiga = lei_atual
         j = 1
-<<<<<<< HEAD
-        # print i, "Lei id 1: ", lei_1, "Lei id 2", lei_2
-        sqlstr = "update gr_lei_lei set count_lei = %s where edge_id = %s"%(str(j),str(id))
-        print sqlstr
-        '''
-        A linha abaixo executa, mas trava o script. 
-        A execução fica travada no MySQLdb/cursors.py linha 282.
-        282 > self._do_get_result()
-        Por alguma razão quando ele executa a query ele fica travado.
-        Deve ser algum bug no meu MySQLdb.
-        Flávio, você poderia tentar rodar por ai, por favor?
-        ''' 
-        cursor2.execute(sqlstr)
-    else:
-=======
         '''
         Cria o script de update da primeira entrada para o lei_id_1 atual
         '''
@@ -157,7 +142,6 @@ while i < cursor.rowcount-2:
         '''
         Incrementamos j para usar como marcadores de ordem seguintes.
         '''
->>>>>>> 1aab63485a554e4d4d95b8eb6a8d3599f4eb66c9
         j += 1
         '''
         Adicionando script à string sqlstr, inserindo o valor atual de j.

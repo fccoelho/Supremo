@@ -97,7 +97,7 @@ while i < cursor1.rowcount-1:
     i += 1
     
 print "Montagem da SqlStr concluída"
-print "Iniciando o send da query"
+print "Iniciando o send da query (pode levar horas... vá buscar um café...)"
 cursor2.execute(sqlstr)
 print '''
     Concluído no Python. 
