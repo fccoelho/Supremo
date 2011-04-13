@@ -18,7 +18,7 @@ where lei_count <= 10
 
 Onde 10 é o número de relações mais relevantes a retornar
 
-O valor pode ir de 0 a 100 na atual configuração do script.
+Use a variável countLimit para definir o valor. Recomendável = 100.
 
 Autores:
     Pablo Cerdeira
@@ -43,6 +43,11 @@ conn = MySQLdb.connect (host = "E04324.fgv.br",
 cursor = conn.cursor()
 
 cursor2 = conn.cursor()
+
+''' 
+Definindo variável limite para inserir contador
+''' 
+countLimit = 100
 
 '''
 Limpando o campo lei_count na tabela gr_lei_lei para atualizações
@@ -130,7 +135,7 @@ while i < cursor.rowcount-2:
         sqlstr = "update gr_lei_lei set lei_count = %s where edge_id = %s; "%(str(j),str(id))
         # print sqlstr
         # cursor2.execute(sqlstr)
-    elif j <= 100:
+    elif j <= countLimit:
         '''
         Este elif é chamado a partir da segunda iteração do loop, quando
         lei_antiga = lei_atual e enquanto o contador interno j < 100.
@@ -162,6 +167,8 @@ if len(sqlstr) > 2:
     print "Enviando updates para o MySQL da lei_id %s..." % str(lei_atual)
     cursor2.execute(sqlstr)
     print "Concluído o update da lei_id %s" % str(lei_atual)
+
+print "Pronto. Pode usar o campo lei_count."
         
 '''
 Fecha cursor e conexão.
