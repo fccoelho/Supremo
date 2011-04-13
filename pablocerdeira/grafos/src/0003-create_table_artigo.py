@@ -23,6 +23,9 @@ Notas:
         ATENÇÃO: Notar que a tabela artigo fica com alguns
         lei_id NULL. Isso se deve a problemas no preenchimento
         da tabela lei. Ver com Flávio.
+        A criação da tabela temp_artigo_lei só é necessária
+        porque meu usuário não tem permissão de alterar tabelas
+        na STF_Analise_Decisao.
 
 '''
 import MySQLdb
@@ -44,6 +47,14 @@ DROP TABLE IF EXISTS artigo;
 '''
 cursor1.execute(sqlstr)
 
+
+print "Dropando a tabela temp_artigo_lei se ela existir"
+sqlstr = '''
+DROP TABLE IF EXISTS temp_artigo_lei;
+'''
+cursor1.execute(sqlstr)
+
+
 print "Criando a tabela artigo"
 sqlstr = '''
 CREATE TABLE artigo (
@@ -57,6 +68,28 @@ cursor1.execute(sqlstr)
 print "Concluída a criação da tabela artigo."
 
 
+print "Criando uma cópia da tabela artigo_lei na SEN_Grafo..."
+
+sqlstr = '''
+create table temp_artigo_lei 
+select *
+from 
+  STF_Analise_Decisao.artigo_lei;
+''' 
+cursor1.execute(sqlstr)
+
+
+print "Adicionando índices à tabela temp_artigo_lei..."
+
+sqlstr = '''
+ALTER TABLE temp_artigo_lei 
+    ADD INDEX ix_id (id ASC), 
+    ADD INDEX ix_lei_id (lei_id ASC),
+    ADD INDEX ix_numero (numero ASC);
+'''
+cursor1.execute(sqlstr)
+
+
 print "Fazendo o select insert para popular a tabela artigo..."
 
 sqlstr = '''
@@ -64,7 +97,7 @@ insert into artigo (lei_id, artigo, ocorrencias)
 select ld.lei_id, numero artigo, count(numero) ocorrencias
 from 
   lei_decisao ld,
-  STF_Analise_Decisao.artigo_lei al
+  temp_artigo_lei al
 where 
   al.lei_id = ld.id
 group by
@@ -72,8 +105,19 @@ group by
 order by
   count(numero) desc;
 ''' 
-
 cursor1.execute(sqlstr)
+
+
+print "Criando índices na tabela artigo. Acredite, é necessário..."
+
+sqlstr = '''
+ALTER TABLE artigo 
+    ADD INDEX ix_lei_id (lei_id ASC), 
+    ADD INDEX ix_artigo (artigo ASC), 
+    ADD INDEX ix_ocorrencias (ocorrencias ASC);
+'''
+cursor1.execute(sqlstr)
+
 
 print "Concluído. Enjoy!"
 

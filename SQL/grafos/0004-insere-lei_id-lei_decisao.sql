@@ -49,12 +49,14 @@ WHERE
 	l.id_correto IS NOT NULL;
 
 /*
-ATENÇÃO: É importante criar o índice para para lei_id, 
+ATENÇÃO: É importante criar os índices para para lei_decisao, 
 do contrário a execução dos scripts em Python serão seriamente
 afetadas.
 */
 ALTER TABLE lei_decisao
-      ADD INDEX ix_lei_id (lei_id ASC)
+      ADD INDEX ix_id (id ASC),
+      ADD INDEX ix_decisao_id (decisao_id ASC),
+      ADD INDEX ix_lei_id (lei_id ASC);
 
 /*
 Concluída esta etapa, o próximo passo é executar os scripts
