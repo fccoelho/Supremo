@@ -1,18 +1,12 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-#Fri Apr 08 17:33:54 BRT 2011
-eclipse.preferences.version=1
-=======
-#Fri Apr 08 22:52:59 BRT 2011
-eclipse.preferences.version=1
-encoding//src/create_table_gr_lei_lei.py=utf-8
->>>>>>> 1aab63485a554e4d4d95b8eb6a8d3599f4eb66c9
-encoding//src/update_count_per_node.py=utf-8
-=======
-#Wed Apr 13 03:05:19 BRT 2011
+#Wed Apr 13 17:12:57 BRT 2011
+=\=\=\=\=\=\=
+<<<<<<<=HEAD
+>>>>>>>=b1bd05c61a503369fbbbed2efd3bafb5a581527f
 eclipse.preferences.version=1
 encoding//src/0001-create_table_gr_lei_lei.py=utf-8
 encoding//src/0002-update_count_per_node.py=utf-8
 encoding//src/0003-create_table_artigo.py=utf-8
 encoding//src/0004-create_table_artigo_lei_decisao.py=utf-8
->>>>>>> b1bd05c61a503369fbbbed2efd3bafb5a581527f
+encoding//src/0005-create_table_gr_artigo_artigo.py=utf-8
+encoding//src/create_table_gr_lei_lei.py=utf-8
+encoding//src/update_count_per_node.py=utf-8
