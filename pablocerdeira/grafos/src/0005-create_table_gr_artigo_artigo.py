@@ -56,6 +56,22 @@ cursor1.execute(sqlstr)
 print "Concluída a criação da tabela."
 
 '''
+Criando índices
+'''
+print "Criando índices para a tabela."
+sqlstr = '''
+ALTER TABLE gr_artigo_artigo 
+    ADD INDEX ix_artigo_id_1 (artigo_id_1 ASC),
+    ADD INDEX ix_lei_id_1 (lei_id_1 ASC),
+    ADD INDEX ix_artigo_id_2 (artigo_id_2 ASC),
+    ADD INDEX ix_lei_id_2 (lei_id_2 ASC),
+    ADD INDEX ix_peso (peso ASC),
+    ADD INDEX ix_artigo_count (artigo_count ASC);
+'''
+cursor1.execute(sqlstr)
+print "Concluída a criação dos índices."
+
+'''
 '''
 print "Pegando o id de cada uma dos artigos e sua lei_id..."
 sqlstr = "select id, lei_id from artigo order by id"
@@ -70,6 +86,12 @@ i = 1
 sqlstr = ""
 while i < cursor1.rowcount-1:
     artigo_id_1, lei_id_1 = cursor1.fetchone()
+    '''
+    Inserindo um teste para lei_id_1 = None, pois isso estava gerando erro no
+    script SQL.
+    '''
+    if lei_id_1 is None:
+        lei_id_1 = "Null"
     sqlstr = sqlstr + '''
         insert into gr_artigo_artigo (artigo_id_1, lei_id_1, artigo_id_2, lei_id_2, peso) 
         select 
@@ -111,6 +133,12 @@ print '''
     Provavelmente ainda está rodando no servidor MySQL.
     A execução no lado do servidor levará algumas horas ainda.
     Verifique a conclusão rodando o comando 'show processlist'
+    
+    Para saber qual a porcentagem dos artigos já inseridos na
+    tabela gr_artigo_artigo execute o seguinte script no MySQL:
+    
+    SELECT max(graa.artigo_id_1)/max(a.id)*100 
+    FROM artigo a, gr_artigo_artigo graa
     '''
 
 cursor1.close()
