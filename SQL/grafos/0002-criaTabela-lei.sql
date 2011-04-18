@@ -32,6 +32,9 @@ Adicionando índice.
 ALTER TABLE lei 
     ADD COLUMN id INT NOT NULL AUTO_INCREMENT FIRST, 
     ADD COLUMN id_correto INT NULL AFTER ano, 
+    ADD COLUMN lei_nome VARCHAR(255) NULL AFTER id_correto, 
+    ADD COLUMN lei_descricao VARCHAR(255) NULL AFTER lei_nome, 
+    ADD COLUMN lei_tipo VARCHAR(45) NULL  AFTER lei_descricao,
     ADD PRIMARY KEY (id);
 
 /*

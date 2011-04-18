@@ -4,6 +4,23 @@ Created on 05/04/2011
 
 @author: flavio
 '''
+'''
+Configurações:
+'''
+confs = "Pablo"
+
+if confs == "Flávio":
+    ubiServer = "http://10.250.46.208:20738/RPC2"
+    MySQLServer = "mysql://root:password@E04324"
+
+if confs == "Pablo":
+    ubiServer = "http://127.0.0.1:20738/RPC2"
+    MySQLServer = "mysql://pablo:pablo@E04324.fgv.br"
+
+'''
+Final das configurações
+'''
+
 import networkx as nx
 import xmlrpclib
 import os, time
@@ -46,19 +63,26 @@ def dyn_graph_lei(elist):
     Visualização dinâmica usando ubigraph
     Servidor Ubigraph deve estar rodando na URL indicada
     """
-    if socket.gethostname()=='E04679':# Versão Flávio
-        U = ubigraph.Ubigraph(URL='http://10.250.46.208:20738/RPC2')
-    else:# Versão Pablo
-        U = ubigraph.Ubigraph(URL='http://127.0.0.1:20738/RPC2')
+    U = ubigraph.Ubigraph(URL=ubiServer)
     U.clear()
+    ''' Versão 1 '''
     v_styles = {'LEG-FED':U.newVertexStyle(id=1,shape="cube", color="#ff0000"),
                 'LEG-EST':U.newVertexStyle(id=2,shape="cube", color="#00ff00"),
                 'LEG-MUN':U.newVertexStyle(id=3,shape="cube", color="#0000ff"),
                 'LEG-DIS':U.newVertexStyle(id=4,shape="cube", color="#0ff000"),
                 'LEG-INT':U.newVertexStyle(id=5,shape="cube", color="#000ff0"),
                 'outras':U.newVertexStyle(id=6,shape="cube", color="#f0f000"),
+                'CF':U.newVertexStyle(id=6,shape="cube", color="#00ff00"),
                 }
-    lei_style = U.newVertexStyle(id=1,shape="cube", color="#ff0000")
+    
+    ''' Versão 2 
+    v_styles = {'CF':U.newVertexStyle(id=1,shape="sphere", color="#ff0000"),
+                'LEI':U.newVertexStyle(id=2,shape="sphere", color="#00ff00"),
+                'SUMULA':U.newVertexStyle(id=3,shape="sphere", color="#0000ff"),
+                'REGIMENTO':U.newVertexStyle(id=4,shape="sphere", color="#0ff000"),
+                }
+    '''
+    lei_style = U.newVertexStyle(id=1,shape="sphere", color="#ff0000")
     #Q = dbgrafo.execute(cf88_vs_outras_q)
     res = elist
     nodes = {}
@@ -81,11 +105,12 @@ def dyn_graph_lei(elist):
             n2 = nodes[e[3]]
         es = e[6]/maxw
         if (n1,n2) not in edges:
-            U.newEdge(n1,n2,spline=True,strength=es, width=es)
+            U.newEdge(n1,n2,spline=True,strength=es, width=2.0, showstrain=True)
             edges.add((n1,n2))
             edges.add((n2,n1))
         c += 1
     #U.endMultiCall()
+    
 
 def cf88_vs_outras(nedges):
     """
@@ -106,7 +131,11 @@ def lei_vs_lei(nedges=None):
     """
     Grafo de todas com todas
     """
-    Q = dbgrafo.execute('select lei_id_1,esfera_1,lei_1,lei_id_2,esfera_2, lei_2, peso from vw_gr_lei_lei where  peso >300 and lei_id_2>2')
+    # Verão original Flávio comentada
+    # Q = dbgrafo.execute('select lei_id_1,esfera_1,lei_1,lei_id_2,esfera_2, lei_2, peso from vw_gr_lei_lei where  peso >300 and lei_id_2>2')
+    # Q = dbgrafo.execute('select lei_id_1,lei_tipo_1,lei_nome_1,lei_id_2,lei_tipo_2, lei_nome_2, peso from vw_gr_lei_lei where lei_count <= 20 and lei_id_1 = 1 and lei_id_2 <= 20 limit 0,1000')
+    # Q = dbgrafo.execute('select lei_id_1,lei_tipo_1,lei_nome_1,lei_id_2,lei_tipo_2, lei_nome_2, peso from vw_gr_lei_lei where lei_count <= 8 and lei_id_1 <= 20 and lei_id_2 <= 20 limit 0,1000')
+    Q = dbgrafo.execute('select lei_id_1,esfera_1,lei_1,lei_id_2,esfera_2, lei_2, peso from vw_gr_lei_lei where lei_count <= 10 and lei_id_1 <= 50 and lei_id_2 <= 200 limit 0,10000')
     if not nedges:
         res = Q.fetchall()
         nedges = len(res)
@@ -145,12 +174,8 @@ def artigo_artigo(nedges=None):
         
 if __name__=="__main__":
     import socket
-    if socket.gethostname() == 'E04679':# versão Flávio
-        dbgrafo = SqlSoup("mysql://root:password@E04324/SEN_Grafo")
-        dbdec = SqlSoup("mysql://root:password@E04324/STF_Analise_Decisao")
-    else:# versão Pablo
-        dbgrafo = SqlSoup("mysql://pablo:pablo@E04324.fgv.br/SEN_Grafo")
-        dbdec = SqlSoup("mysql://pablo:pablo@E04324.fgv.br/STF_Analise_Decisao")
+    dbgrafo = SqlSoup("%s/SEN_Grafo" % MySQLServer)
+    dbdec = SqlSoup("%s/STF_Analise_Decisao" % MySQLServer)
     #cf88_vs_outras(500)
     #dyn_graph(1000)
     G,elist = lei_vs_lei()
