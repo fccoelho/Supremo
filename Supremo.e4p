@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Project SYSTEM "Project-4.6.dtd">
 <!-- eric4 project file for project Supremo -->
-<!-- Saved: 2011-04-11, 09:42:10 -->
+<!-- Saved: 2011-04-15, 19:07:09 -->
 <!-- Copyright (C) 2011 ,  -->
 <Project version="4.6">
   <Language>en</Language>
@@ -23,6 +23,7 @@
     <Source>visualiza/lebanco.py</Source>
     <Source>visualiza/ubigraph.py</Source>
     <Source>visualiza/grafos.py</Source>
+    <Source>clean/nlp.py</Source>
   </Sources>
   <Forms>
   </Forms>
