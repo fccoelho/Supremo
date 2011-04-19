@@ -52,11 +52,19 @@ order by
   count(ld_1.lei_id) desc
 """
 
-v_colors = {'LEG-FED':"#ff0000",
-            'LEG-EST':"#00ff00",
-            'LEG-MUN':"#0000ff"
-            }
+def timeit(method):
+    """
+    Decorator to time methods (or functions)
+    """
+    def timed(*args, **kw):
+        ts = time.time()
+        result = method(*args, **kw)
+        te = time.time()
 
+        print '%r  %2.2f sec' % \
+              (method.__name__ , te-ts)
+        return result
+        
 
 def dyn_graph_lei(elist):
     """
@@ -148,10 +156,10 @@ def lei_vs_lei(nedges=None):
     print "== Grafo Lei_Lei =="
     print "==> Order: ",G.order()
     print "==> # Edges: ",len(G.edges())
-    #nx.draw_random(G)
-    #nx.draw_graphviz(G)
-    #nx.write_dot(G, 'grafo_lei_vs_lei_%s.dot'%nedges)
-    #P.savefig('grafo_lei_vs_lei_%s.png'%nedges)
+    nx.draw_random(G)
+    nx.draw_graphviz(G)
+    nx.write_dot(G, 'grafo_lei_vs_lei_%s.dot'%nedges)
+    P.savefig('grafo_lei_vs_lei_%s.png'%nedges)
     return G,res
 
 def artigo_artigo(nedges=None):
