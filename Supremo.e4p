@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Project SYSTEM "Project-4.6.dtd">
 <!-- eric4 project file for project Supremo -->
-<!-- Saved: 2011-04-15, 19:07:09 -->
+<!-- Saved: 2011-04-19, 11:02:37 -->
 <!-- Copyright (C) 2011 ,  -->
 <Project version="4.6">
   <Language>en</Language>
@@ -24,6 +24,21 @@
     <Source>visualiza/ubigraph.py</Source>
     <Source>visualiza/grafos.py</Source>
     <Source>clean/nlp.py</Source>
+    <Source>SQL/grafos/0007-update_lei_sem_acentos.sql</Source>
+    <Source>SQL/grafos/0002-criaTabela-lei.sql</Source>
+    <Source>SQL/grafos/0005-cria_vw_gr_lei_lei.sql</Source>
+    <Source>SQL/grafos/0006-cria_vw_gr_artigo_artigo.sql</Source>
+    <Source>SQL/grafos/0007-update_lei.sql</Source>
+    <Source>SQL/grafos/0006-cria_vw_gr_srtigo_artigo.sql</Source>
+    <Source>SQL/grafos/0003-insereId_correto-lei.sql</Source>
+    <Source>SQL/grafos/0004-insere-lei_id-lei_decisao.sql</Source>
+    <Source>SQL/grafos/0001-importaTabela-lei_decisao.sql</Source>
+    <Source>pablocerdeira/grafos/src/strsql.sql</Source>
+    <Source>pablocerdeira/grafos/src/0002-update_count_per_node.py</Source>
+    <Source>pablocerdeira/grafos/src/0003-create_table_artigo.py</Source>
+    <Source>pablocerdeira/grafos/src/0004-create_table_artigo_lei_decisao.py</Source>
+    <Source>pablocerdeira/grafos/src/0005-create_table_gr_artigo_artigo.py</Source>
+    <Source>pablocerdeira/grafos/src/0001-create_table_gr_lei_lei.py</Source>
   </Sources>
   <Forms>
   </Forms>
