@@ -1,15 +1,15 @@
 
-SUPREMO EM NÚMEROS
+SUPREMO EM N√öMEROS
 
-Descrição do projeto
+Descri√ß√£o do projeto
 
 
-ORGANIZAÇÃO DAS PASTAS
+ORGANIZA√á√ÉO DAS PASTAS
 
 BaixaLeis:
-	Crawler para colectar leis, artigos e incisos da legislação federal.
-	Responsável: Augusto Nasser
-	Status: não iniciado
+	Crawler para colectar leis, artigos e incisos da legisla√ß√£o federal.
+	Respons√°vel: Augusto Nasser
+	Status: n√£o iniciado
 
 	Estrutura:
 	baixaleis
@@ -17,20 +17,20 @@ BaixaLeis:
 
 
 DB_SEN_Grafo:
-	Estruturação do banco de dados SEN_Grafo.
-	Responsável: Pablo Cerdeira
+	Estrutura√ß√£o do banco de dados SEN_Grafo.
+	Respons√°vel: Pablo Cerdeira
 	Status: desenvolvimento
 
 	Estrutura:
 	db_sen_grafo
 	|-> model: modelos de dados
 	|-> sql: scripts sql
-	|-> src: sources Python utilizados para a estruturação.
+	|-> src: sources Python utilizados para a estrutura√ß√£o.
 
 Doc:
-	Documentação geral do projeto.
-	Responsável: 
-	Status: não iniciado
+	Documenta√ß√£o geral do projeto.
+	Respons√°vel: 
+	Status: n√£o iniciado
 
 	Estrutura:
 	doc
@@ -38,7 +38,7 @@ Doc:
 
 ETL:
 	Projeto de ... 
-	Responsável: Flávio Coelho
+	Respons√°vel: Fl√°vio Coelho
 	Status: desenvolvimento
 
 	Estrutura:
@@ -47,8 +47,8 @@ ETL:
 
 ubiGUI:
 	Desenvolvimento de uma GUI para controle interativo dos grafos no UbiGraph.
-	Responsável: Flávio Coelho
-	Status: iniciação 
+	Respons√°vel: Fl√°vio Coelho
+	Status: inicia√ß√£o 
 
 	Estrutura:
 	ubigui
@@ -56,7 +56,7 @@ ubiGUI:
 
 Visualiza:
 	Projeto ...
-	Responsável: ... 
+	Respons√°vel: ... 
 	Status: desenvolvimento
 
 	Estrutura:
