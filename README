@@ -1,0 +1,65 @@
+
+SUPREMO EM NòMEROS
+
+Descri‹o do projeto
+
+
+ORGANIZA‚ÌO DAS PASTAS
+
+BaixaLeis:
+	Crawler para colectar leis, artigos e incisos da legisla‹o federal.
+	Respons‡vel: Augusto Nasser
+	Status: n‹o iniciado
+
+	Estrutura:
+	baixaleis
+	|-> ...
+
+
+DB_SEN_Grafo:
+	Estrutura‹o do banco de dados SEN_Grafo.
+	Respons‡vel: Pablo Cerdeira
+	Status: desenvolvimento
+
+	Estrutura:
+	db_sen_grafo
+	|-> model: modelos de dados
+	|-> sql: scripts sql
+	|-> src: sources Python utilizados para a estrutura‹o.
+
+Doc:
+	Documenta‹o geral do projeto.
+	Respons‡vel: 
+	Status: n‹o iniciado
+
+	Estrutura:
+	doc
+	|-> <nome_projeto>
+
+ETL:
+	Projeto de ... 
+	Respons‡vel: Fl‡vio Coelho
+	Status: desenvolvimento
+
+	Estrutura:
+	etl
+	|-> ... 
+
+ubiGUI:
+	Desenvolvimento de uma GUI para controle interativo dos grafos no UbiGraph.
+	Respons‡vel: Fl‡vio Coelho
+	Status: inicia‹o 
+
+	Estrutura:
+	ubigui
+	|-> ... 
+
+Visualiza:
+	Projeto ...
+	Respons‡vel: ... 
+	Status: desenvolvimento
+
+	Estrutura:
+	visualiza
+	|-> ... 
+
