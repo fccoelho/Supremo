@@ -37,7 +37,7 @@ def busca_expressoes(cursor,  querydb, num_registros, rawstr1, rawstr2=''):
         if not match_obj1 and not match_obj2: dec_analise.append(texto)   
         if match_obj1: matches1 +=1
         if match_obj2: matches2 +=1
-    print 'foram encontrados',  matches1, 'da expressao',  match_obj1
+    print 'foram encontrados',  matches1, '(', ((matches1/num_registros)*100),'%)','da expressao',  match_obj1
     if rawstr2: print 'foram encontrados',  matches2, 'da expressao',  match_obj2
     return matches1, matches2
     cursor.close()
