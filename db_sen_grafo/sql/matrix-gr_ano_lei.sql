@@ -17,6 +17,6 @@ FROM
     SEN_Grafo.matrix
   ) t
 GROUP BY
-  t.ano
+  t.ano, t.lei_id
 ORDER BY
   count(t.lei_id) DESC;
