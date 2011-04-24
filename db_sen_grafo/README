@@ -1,0 +1,87 @@
+--------------------------------------------------------------------------
+- Autor: 			Pablo Cerdeira
+- Última alteração: 24/04/2011
+--------------------------------------------------------------------------
+
+
+1. DB_SEN_GRAFO README
+
+O diretório db_den_grafo contém os arquivos para a construção da instância
+SEN_Grafo no banco de dados.
+
+Ele está dividido em 3 subdiretórios:
+
+- model: subdiretório que contém os arquivos de modelo de dados, necessários
+para a compreensão dos relacionamentos entre as tabelas.
+
+- sql: scripts SQL para criar e popular tabelas e para criar as rotinas (procedures)
+do banco de dados.
+
+- src: scripts Python utilizados para a população de tabelas quando o SQL não 
+for suficiente.
+
+
+2. ESTRUTURA DAS TABELAS
+
+2.1. Engines:
+
+São utilizadas 3 engines diferentes para as tabelas da instância SEN_Grafo:
+
+a) MyISAM/MariaDB/AriaDB: 
+As tabelas, por padrão, são criadas usando a engine MyISAM ou MariaDB/AriaDB.
+
+b) MEMORY:
+Algumas tabelas, sufixadas por "_mem" indicam tabelas em MEMORY, utilizadas 
+para algumas rotinas que exigem grandes cruzamentos de dados.
+Quando utilizada uma tabela do tipo MEMORY, outra tabela, idêntica, é criada
+com o sufixo "_disk" utilizando a engine MyISAM/MariaDB para persistência
+caso o servidor seja reiniciado. 
+
+c) OQGraph:
+A engine OQGraph é utilizada em paralelo às tabelas em disco ("_disk") e são
+identificadas pelo sufixo "_oq". Dado ser um engine não-persistente (em memória),
+os procedimentos para sua criação são salvos no banco como procedures e sempre
+utilizam como base uma tabela de mesmo nome, com o sufixo "_disk" para sua
+criação.
+
+2.2. Nomes das tabelas:
+
+As tabelas utilizadas para a geração dos grafos seguem o seguinte padrão de nomes:
+
+a) <objeto>: tabelas sem prefixo ou sem sufixo são tabelas de objetos, como "lei", 
+"decisão", "artigo" etc.
+
+b) gr_<objeto1>_<objeto2>: as tabelas prefixadas por "gr_" indicam tabelas de 
+relacionamentos entre os objetos 1 e 2. 
+Quando o sufixo é "_disk" significa que se trata de uma tabela persistente, em 
+disco.
+Quando sufixada com "_oq" trata-se de uma tabela da engine Open Query Graph, e é
+do tipo não-persistente. Caso a tabela não exista no banco após um reboot, 
+executar a procedure "SEN_Grafo.cria_gr_<objeto1>_<objeto2_oq>" (comando call) 
+para sua criação a partir da tabela gr_<objeto1>_<objeto2>_disk.
+Quando sufixada com "_mem" significa que a tabela é do tipo MEMORY. O procedimento
+para sua criação é semelhante ao anterior 
+(call SEN_Grafo.cria_gr_<objeto1>_<objeto2>_mem). Atenção: nem sempre o servidor
+tem memória suficiente para sua criação.
+
+2.3. Estrutura de dados nas tabelas:
+
+As tabelas de objetos <objeto> não tem estrutura fixa, salvo um campo id (PK),
+utilizado para sua identificação nas tabelas de grafos. Maiores detalhes
+podem ser obtidos junto ao modelo de dados.
+
+As tabelas de grafos entre objetos (gr_<objeto1>_<objeto2>) tem estrutura fixa,
+sendo sempre compostas das seguintes colunas:
+- origid: id do nó de origem de uma aresta;
+- destid: id do nó de destino de uma aresta;
+- weight: peso da aresta.
+
+Esta estrutura é válida tanto para as tabelas em disco ("_disk") quanto para
+as tabelas Open Query Graph ("_oq").
+
+ATENÇÃO:
+As colunas origid e destid devem ser inteiros. Entretanto, em alguns casos
+ainda estão como texto, até a criação das tabelas de objetos correspondentes.
+
+---------------------------------- EOF -----------------------------------
+
