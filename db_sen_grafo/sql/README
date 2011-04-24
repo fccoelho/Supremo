@@ -69,11 +69,25 @@ criação da tabela lei. Após, alguns ids são substituídos pelos ids_corretos
 para os casos em que detectamos erros de digitação na lei.
 
 
+5. 0005-criaTabela-artigo.sql
+
+Descrição:
+Cria a tabela de objetos artigo a partir da tabela lei_decisao.
+
+Dependências:
+SEN_Grafo.lei_decisao
+
+Observações:
+Insere também uma PK para cada artigo-lei.
+
+
+
+
 
 OBS:
 Ainda falta documentar:
-1. Criação da tabela de artigos;
-2. Criação da tabela matrix;
+1. Criação da tabela artigo_lei_decisao.
+2. Criação da tabela matrix.
 3. Criação das procedures dependentes da matrix.
 4. Criação das views.
 5. Excluir scripts repetidos ou substituídos.

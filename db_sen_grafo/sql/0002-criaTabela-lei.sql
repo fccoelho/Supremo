@@ -12,6 +12,8 @@ mais citadas no início da tabela.
 Primeiro vamos criar uma tabela em branco com a estrutura dos campos da lei_decisao
 Não inserimos conteúdo ainda para podermos inserir depois, com uma PK.
 */
+USE SEN_Grafo;
+
 CREATE TABLE lei
 SELECT DISTINCT
     esfera, lei, ano

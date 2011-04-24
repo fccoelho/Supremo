@@ -12,6 +12,8 @@ apenas para os casos de Constituição cadastrada de forma incorreta.
 Inserindo id_correto para os casos da Constituição 1988 detectados no banco.
 Este trabalho é manual.
 */
+USE SEN_Grafo;
+
 UPDATE lei SET id_correto = 1
 WHERE
 	(

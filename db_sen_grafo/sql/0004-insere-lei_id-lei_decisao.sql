@@ -13,6 +13,8 @@ sem índices nas colunas esfera, lei e ano esta query é
 bastante demorada.
 Por isso antes vamos inserir os índices em ambas.
 */
+USE SEN_Grafo;
+
 
 ALTER TABLE lei
       ADD INDEX ix_esfera (esfera ASC), 

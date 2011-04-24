@@ -4,6 +4,7 @@ Autor: Pablo Cerdeira
 Importando tabela lei_decisao da instância STF_Analise_Decisao
 
 */
+USE SEN_Grafo;
 
 CREATE TABLE lei_decisao
 SELECT *
