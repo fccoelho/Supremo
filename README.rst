@@ -11,10 +11,10 @@ BaixaLeis:
 ~~~~~~~~~~
 
 	Crawler para colectar leis, artigos e incisos da legislação federal.
-	*Responsável:* Augusto Nasser
-	*Status:* não iniciado
+	**Responsável:** Augusto Nasser
+	**Status:** não iniciado
 
-	*Estrutura:*
+	**Estrutura:**
 	baixaleis
 	|-> ...
 
@@ -23,10 +23,10 @@ DB_SEN_Grafo:
 ~~~~~~~~~~~~~
 
 	Estruturação do banco de dados SEN_Grafo.
-	*Responsável:* Pablo Cerdeira
-	*Status:* desenvolvimento
+	**Responsável:** Pablo Cerdeira
+	**Status:** desenvolvimento
 
-	*Estrutura:*
+	**Estrutura:**
 	db_sen_grafo
 	|-> model: modelos de dados
 	|-> sql: scripts sql
@@ -35,10 +35,10 @@ DB_SEN_Grafo:
 Doc:
 ~~~~
 	Documentação geral do projeto.
-	*Responsável:* 
-	*Status:* não iniciado
+	**Responsável:** 
+	**Status:** não iniciado
 
-	*Estrutura:*
+	**Estrutura:**
 	doc
 	|-> <nome_projeto>
 
@@ -46,10 +46,10 @@ ETL:
 ~~~~
 
 	Projeto de ... 
-	*Responsável:* Flávio Coelho
-	*Status:* desenvolvimento
+	**Responsável:** Flávio Coelho
+	**Status:** desenvolvimento
 
-	*Estrutura:*
+	**Estrutura:**
 	etl
 	|-> ... 
 
@@ -57,10 +57,10 @@ ubiGUI:
 ~~~~~~~
 
 	Desenvolvimento de uma GUI para controle interativo dos grafos no UbiGraph.
-	*Responsável:* Flávio Coelho
-	*Status:* iniciação 
+	**Responsável:** Flávio Coelho
+	**Status:** iniciação 
 
-	*Estrutura:*
+	**Estrutura:**
 	ubigui
 	|-> ... 
 
@@ -68,10 +68,10 @@ Visualiza:
 ~~~~~~~~~~
 
 	Projeto ...
-	*Responsável:* ... 
-	*Status:* desenvolvimento
+	**Responsável:** ... 
+	**Status:** desenvolvimento
 
-	*Estrutura:*
+	**Estrutura:**
 	visualiza
 	|-> ... 
 
