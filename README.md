@@ -1,11 +1,15 @@
-=== SUPREMO EM NÚMEROS ===
+SUPREMO EM NÚMEROS
+=====================
 
-== Descrição do projeto ==
+Descrição do projeto 
+------------------------------
 
+ORGANIZAÇÃO DAS PASTAS
+----------------------------------------------
 
-== ORGANIZAÇÃO DAS PASTAS == 
+BaixaLeis:
+~~~~~~~~
 
-= BaixaLeis: = 
 	Crawler para colectar leis, artigos e incisos da legislação federal.
 	Responsável: Augusto Nasser
 	Status: não iniciado
