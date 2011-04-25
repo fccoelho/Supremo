@@ -1,12 +1,11 @@
+=== SUPREMO EM NÚMEROS ===
 
-SUPREMO EM NÚMEROS
-
-Descrição do projeto
+== Descrição do projeto ==
 
 
-ORGANIZAÇÃO DAS PASTAS
+== ORGANIZAÇÃO DAS PASTAS == 
 
-BaixaLeis:
+= BaixaLeis: = 
 	Crawler para colectar leis, artigos e incisos da legislação federal.
 	Responsável: Augusto Nasser
 	Status: não iniciado
@@ -16,7 +15,7 @@ BaixaLeis:
 	|-> ...
 
 
-DB_SEN_Grafo:
+= DB_SEN_Grafo: =
 	Estruturação do banco de dados SEN_Grafo.
 	Responsável: Pablo Cerdeira
 	Status: desenvolvimento
@@ -27,7 +26,7 @@ DB_SEN_Grafo:
 	|-> sql: scripts sql
 	|-> src: sources Python utilizados para a estruturação.
 
-Doc:
+= Doc:= 
 	Documentação geral do projeto.
 	Responsável: 
 	Status: não iniciado
@@ -36,7 +35,7 @@ Doc:
 	doc
 	|-> <nome_projeto>
 
-ETL:
+= ETL:= 
 	Projeto de ... 
 	Responsável: Flávio Coelho
 	Status: desenvolvimento
@@ -45,7 +44,7 @@ ETL:
 	etl
 	|-> ... 
 
-ubiGUI:
+= ubiGUI:= 
 	Desenvolvimento de uma GUI para controle interativo dos grafos no UbiGraph.
 	Responsável: Flávio Coelho
 	Status: iniciação 
@@ -54,7 +53,7 @@ ubiGUI:
 	ubigui
 	|-> ... 
 
-Visualiza:
+= Visualiza:= 
 	Projeto ...
 	Responsável: ... 
 	Status: desenvolvimento
