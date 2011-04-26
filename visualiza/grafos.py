@@ -7,9 +7,9 @@ Created on 05/04/2011
 '''
 Configurações:
 '''
-confs = "Pablo"
+confs = "Flavio"
 
-if confs == "Flávio":
+if confs == "Flavio":
     ubiServer = "http://10.250.46.208:20738/RPC2"
     MySQLServer = "mysql://root:password@E04324"
 
@@ -30,6 +30,8 @@ import matplotlib.pyplot as P
 from matplotlib.colors import rgb2hex
 from matplotlib import cm
 import ubigraph
+import cPickle
+import gzip
 
 cf88_vs_outras_q = """
 select 
@@ -52,19 +54,17 @@ order by
   count(ld_1.lei_id) desc
 """
 
-def timeit(method):
+def timeit(fun):
     """
     Decorator to time methods (or functions)
     """
     def timed(*args, **kw):
         ts = time.time()
-        result = method(*args, **kw)
+        result = fun(*args, **kw)
         te = time.time()
-
-        print '%r  %2.2f sec' % \
-              (method.__name__ , te-ts)
+        print '%r (%s,%s)  %2.2f sec'%(fun.__name__, args, kw , te-ts)
         return result
-        
+    return timed
 
 def dyn_graph_lei(elist):
     """
@@ -156,10 +156,7 @@ def lei_vs_lei(nedges=None):
     print "== Grafo Lei_Lei =="
     print "==> Order: ",G.order()
     print "==> # Edges: ",len(G.edges())
-    nx.draw_random(G)
-    nx.draw_graphviz(G)
-    nx.write_dot(G, 'grafo_lei_vs_lei_%s.dot'%nedges)
-    P.savefig('grafo_lei_vs_lei_%s.png'%nedges)
+
     return G,res
 
 def artigo_artigo(nedges=None):
@@ -179,16 +176,66 @@ def artigo_artigo(nedges=None):
     print "==> # Edges: ",len(G.edges())
     print "==> # Cliques: ", nx.algorithms.clique.graph_number_of_cliques(G)
     print "==> Avg. Clustering: ", nx.average_clustering(G)
+
+def salva_grafo_imagem(G):
+    """
+    Salva grafos em formato png e dot
+    """
+    nx.draw_graphviz(G)
+    nx.write_dot(G, 'relatorios/grafo_lei_vs_lei.dot')
+    P.savefig('relatorios/grafo_lei_vs_lei.png')
+    
+@timeit
+def cria_grafo_de_tabela(db, tabela):
+    """Cria multigrafo a partir de uma tabela no banco"""
+    G = nx.MultiGraph(nome=tabela)
+    Q =db.execute('select * from %s'%tabela)
+    vnames  = Q.keys()
+    for r in Q:
+        attrs = dict(zip(vnames[1:], r[1:]))
+        G.add_node(r[0], **attrs)
+    return G
+
+@timeit
+def salva_grafo_db(G):
+    """Salva pickle do grafo compactado"""
+    gp = gzip.zlib.compress(cPickle.dumps(G, protocol=2))
+    dbdec.nx_grafo.insert(nome=G.graph['nome'], grafo=gp)
+    dbdec.commit()
+
         
+@timeit
+def salva_grafo_pickled(G):
+    
+    nx.write_gpickle(G, G.graph['nome']+'.pickle')
+    
+@timeit
+def le_grafo_pickled(nome):
+    G = nx.read_gpickle(nome+'.pickle')
+    return G
+
+@timeit
+def le_grafo_do_banco(nome):
+    g = dbdec.nx_grafo.filter(dbdec.nx_grafo.nome == nome).one()
+    G = cPickle.loads(gzip.zlib.decompress(g.grafo))
+    return G
+
 if __name__=="__main__":
     import socket
     dbgrafo = SqlSoup("%s/SEN_Grafo" % MySQLServer)
     dbdec = SqlSoup("%s/STF_Analise_Decisao" % MySQLServer)
-    #cf88_vs_outras(500)
-    #dyn_graph(1000)
-    G,elist = lei_vs_lei()
-    artigo_artigo()
-    
-    #P.show()
-    dyn_graph_lei(elist)
+#    cf88_vs_outras(500)
+#    dyn_graph(1000)
+#    G,elist = lei_vs_lei()
+#    artigo_artigo()
+    G = cria_grafo_de_tabela(dbdec,'decisao')
+    salva_grafo_db(G)
+    G = le_grafo_do_banco('decisao')
+#    salva_grafo_pickled(G)
+#    Gl = cria_grafo_de_tabela(dbdec,'lei_decisao')
+#    salva_grafo_pickled(Gl)
+#    G = le_grafo_pickled('decisao')
+    print G.order()
+#    P.show()
+#    dyn_graph_lei(elist)
     
