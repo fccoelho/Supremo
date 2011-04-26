@@ -2,6 +2,8 @@
 """
 Testes do módulo grafos.
 
+para executar os testes basta ter o nose instalado (sudo easy_install nose), e executar nosetests no diretorio do projeto
+
 """
 from grafos import *
 import os
