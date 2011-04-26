@@ -177,7 +177,7 @@ def artigo_artigo(nedges=None):
     print "==> # Cliques: ", nx.algorithms.clique.graph_number_of_cliques(G)
     print "==> Avg. Clustering: ", nx.average_clustering(G)
 
-def salva_grafo_imagem(G):
+def salva_grafoNX_imagem(G):
     """
     Salva grafos em formato png e dot
     """
@@ -186,8 +186,11 @@ def salva_grafo_imagem(G):
     P.savefig('relatorios/grafo_lei_vs_lei.png')
     
 @timeit
-def cria_grafo_de_tabela(db, tabela):
-    """Cria multigrafo a partir de uma tabela no banco"""
+def cria_grafoNX_de_tabela (db, tabela):
+    """
+    Cria multigrafo a partir de uma tabela no banco.
+    Cria apenas vertices. arestas serao adicionadas posteriormente
+    """
     G = nx.MultiGraph(nome=tabela)
     Q =db.execute('select * from %s'%tabela)
     vnames  = Q.keys()
@@ -197,44 +200,50 @@ def cria_grafo_de_tabela(db, tabela):
     return G
 
 @timeit
-def salva_grafo_db(G):
-    """Salva pickle do grafo compactado"""
+def salva_grafoNX_db(G):
+    """
+    Salva pickle compactado do grafo como um blob no Banco
+    """
     gp = gzip.zlib.compress(cPickle.dumps(G, protocol=2))
     dbdec.nx_grafo.insert(nome=G.graph['nome'], grafo=gp)
     dbdec.commit()
 
-        
 @timeit
-def salva_grafo_pickled(G):
-    
-    nx.write_gpickle(G, G.graph['nome']+'.pickle')
-    
+def salva_grafoNX_file(G):
+    """
+    Salva pickle de grafo em disco 
+    """
+    gp = gzip.zlib.compress(cPickle.dumps(G, protocol=2))
+    with open(G.graph['nome']+'.pickle.gz', 'wb') as f:
+        f.write(gp)
+
 @timeit
-def le_grafo_pickled(nome):
-    G = nx.read_gpickle(nome+'.pickle')
+def le_grafoNX_file(nome):
+    with open(nome+'.pickle.gz', 'rb') as f:
+        gp = f.read()
+    G = cPickle.loads(gzip.zlib.decompress(gp))
     return G
 
 @timeit
-def le_grafo_do_banco(nome):
+def le_grafoNX_db(nome):
     g = dbdec.nx_grafo.filter(dbdec.nx_grafo.nome == nome).one()
     G = cPickle.loads(gzip.zlib.decompress(g.grafo))
     return G
 
 if __name__=="__main__":
-    import socket
     dbgrafo = SqlSoup("%s/SEN_Grafo" % MySQLServer)
     dbdec = SqlSoup("%s/STF_Analise_Decisao" % MySQLServer)
 #    cf88_vs_outras(500)
 #    dyn_graph(1000)
 #    G,elist = lei_vs_lei()
 #    artigo_artigo()
-    G = cria_grafo_de_tabela(dbdec,'decisao')
-    salva_grafo_db(G)
-    G = le_grafo_do_banco('decisao')
-#    salva_grafo_pickled(G)
-#    Gl = cria_grafo_de_tabela(dbdec,'lei_decisao')
-#    salva_grafo_pickled(Gl)
-#    G = le_grafo_pickled('decisao')
+    G = cria_grafoNX_de_tabela(dbdec,'decisao')
+    salva_grafoNX_db(G)
+    G = le_grafoNX_db('decisao')
+#    salva_grafoNX_file(G)
+#    Gl = cria_grafoNX_de_tabela(dbdec,'lei_decisao')
+#    salva_grafoNX_file(Gl)
+#    G = le_grafoNX_file('decisao')
     print G.order()
 #    P.show()
 #    dyn_graph_lei(elist)
