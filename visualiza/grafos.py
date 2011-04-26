@@ -22,8 +22,10 @@ Final das configurações
 '''
 
 import networkx as nx
+from networkx import NetworkXError
 import os
 import time
+from itertools import cycle
 from sqlalchemy.ext.sqlsoup import SqlSoup
 import numpy as np
 import matplotlib.pyplot as P
@@ -65,6 +67,43 @@ def timeit(fun):
         print '%r (%s,%s)  %2.2f sec'%(fun.__name__, args, kw , te-ts)
         return result
     return timed
+
+def dyn_graph_general(elist, order, vstyles=[],estyles=[]):
+    """
+    Visualização dinâmica usando ubigraph
+    Servidor Ubigraph deve estar rodando na URL indicada
+    elist is a list of tuples: (n1,n2,w)
+    """
+    U = ubigraph.Ubigraph(URL=ubiServer)
+    U.clear()
+    nodes = {}
+    edges = set([])
+    #print res[0]
+    maxw = float(max(np.array([i[2] for i in elist]))) #largest weight
+    #U.beginMultiCall()
+    if not vstyles:
+        vstyles = cycle([U.newVertexStyle(id=1,shape="sphere", color="#ff0000")])
+    else:
+        vstyles = cycle(vstyles)
+
+    lei_style = U.newVertexStyle(id=2,shape="cube", color="#00ff00")
+
+    for e in elist:
+        if e[0] not in nodes:
+            n1 = U.newVertex(style=vstyles.next(), label=str(e[0]).decode('latin-1'))
+            nodes[e[0]] = n1
+        else:
+            n1 = nodes[e[0]]
+        if e[1] not in nodes:
+            n2 = U.newVertex(style=lei_style, label=str(e[1]))
+            nodes[e[1]] = n2
+        else:
+            n2 = nodes[e[1]]
+        es = e[2]/maxw
+        if (n1,n2) not in edges:
+            U.newEdge(n1,n2,spline=True,strength=es, width=2.0, showstrain=True)
+            edges.add((n1,n2))
+            edges.add((n2,n1))
 
 def dyn_graph_lei(elist):
     """
@@ -173,8 +212,22 @@ def artigo_artigo(nedges=None):
     G = nx.Graph()
     G.add_weighted_edges_from(eds)
     return G, eds
-    
 
+def ministro_lei(nedges=0):
+    """
+    Cria multigrafo de Ministros e leis
+    """
+    Q = dbgrafo.execute('select origid, destid, weight from gr_ministro_lei where weight >100')
+    if not nedges:
+        res = Q.fetchall()
+        nedges = len(res)
+    else:
+        res = Q.fetchmany(nedges)
+    eds = [(i[0],i[1],i[2]) for i in res]
+    G = nx.DiGraph(nome='ministro_lei')
+    G.add_weighted_edges_from(eds)
+    return G, eds
+    
 def salva_grafoNX_imagem(G):
     """
     Salva grafos em formato png e dot
@@ -233,15 +286,18 @@ def graph_stats(G):
     print "==> Order: ",G.order()
     print "==> # Edges: ",len(G.edges())
     print "==> # Cliques: ", nx.algorithms.clique.graph_number_of_cliques(G)
-    print "==> Avg. Clustering: ", nx.average_clustering(G)
-
+    try:
+        print "==> Avg. Clustering: ", nx.average_clustering(G)
+    except NetworkXError:
+        pass
 if __name__=="__main__":
     dbgrafo = SqlSoup("%s/SEN_Grafo" % MySQLServer)
     dbdec = SqlSoup("%s/STF_Analise_Decisao" % MySQLServer)
 #    cf88_vs_outras(500)
 #    dyn_graph(1000)
 #    G,elist = lei_vs_lei()
-    artigo_artigo()
+#    artigo_artigo()
+    G,elist = ministro_lei()
 #    G = cria_grafoNX_de_tabela(dbdec,'decisao')
 #    salva_grafoNX_db(G)
 #    G = le_grafoNX_db('decisao')
@@ -251,5 +307,5 @@ if __name__=="__main__":
 #    G = le_grafoNX_file('decisao')
     graph_stats(G)
 #    P.show()
-#    dyn_graph_lei(elist)
+    dyn_graph_general(elist,G.order())
     
