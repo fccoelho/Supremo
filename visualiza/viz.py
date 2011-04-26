@@ -110,7 +110,7 @@ class AnalisaCitacoes:
         return alc
         
     @timeit
-    def espacial(self,  view=False):
+    def espacial(self):
         """
         generates a blob map with counts decisions by state
         """

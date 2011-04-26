@@ -22,8 +22,8 @@ Final das configurações
 '''
 
 import networkx as nx
-import xmlrpclib
-import os, time
+import os
+import time
 from sqlalchemy.ext.sqlsoup import SqlSoup
 import numpy as np
 import matplotlib.pyplot as P
@@ -100,7 +100,6 @@ def dyn_graph_lei(elist):
     #U.beginMultiCall()
     c = 1
     for e in res:
-
         if e[0] not in nodes:
             n1 = U.newVertex(style=v_styles[e[1]], label=str(e[2]))
             nodes[e[0]] = n1
@@ -137,7 +136,7 @@ def cf88_vs_outras(nedges):
 
 def lei_vs_lei(nedges=None):
     """
-    Grafo de todas com todas
+    Grafo de todas com todas (leis)
     """
     # Verão original Flávio comentada
     # Q = dbgrafo.execute('select lei_id_1,esfera_1,lei_1,lei_id_2,esfera_2, lei_2, peso from vw_gr_lei_lei where  peso >300 and lei_id_2>2')
@@ -160,7 +159,9 @@ def lei_vs_lei(nedges=None):
     return G,res
 
 def artigo_artigo(nedges=None):
-    """grafo de artigos de leis"""
+    """
+    grafo de artigos de leis
+    """
     
     Q = dbgrafo.execute('select artigo_id_1,esfera_1,artigo_1,lei_1,artigo_id_2,esfera_2, artigo_2, lei_2, peso from vw_gr_artigo_artigo where  peso >100')
     if not nedges:
@@ -171,11 +172,8 @@ def artigo_artigo(nedges=None):
     eds = [(i[0],i[4],i[8]) for i in res]
     G = nx.Graph()
     G.add_weighted_edges_from(eds)
-    print "== Grafo Artigo_Artigo == "
-    print "==> Order: ",G.order()
-    print "==> # Edges: ",len(G.edges())
-    print "==> # Cliques: ", nx.algorithms.clique.graph_number_of_cliques(G)
-    print "==> Avg. Clustering: ", nx.average_clustering(G)
+    return G, eds
+    
 
 def salva_grafoNX_imagem(G):
     """
@@ -230,21 +228,28 @@ def le_grafoNX_db(nome):
     G = cPickle.loads(gzip.zlib.decompress(g.grafo))
     return G
 
+def graph_stats(G):
+    print "== Grafo Artigo_Artigo == "
+    print "==> Order: ",G.order()
+    print "==> # Edges: ",len(G.edges())
+    print "==> # Cliques: ", nx.algorithms.clique.graph_number_of_cliques(G)
+    print "==> Avg. Clustering: ", nx.average_clustering(G)
+
 if __name__=="__main__":
     dbgrafo = SqlSoup("%s/SEN_Grafo" % MySQLServer)
     dbdec = SqlSoup("%s/STF_Analise_Decisao" % MySQLServer)
 #    cf88_vs_outras(500)
 #    dyn_graph(1000)
 #    G,elist = lei_vs_lei()
-#    artigo_artigo()
-    G = cria_grafoNX_de_tabela(dbdec,'decisao')
-    salva_grafoNX_db(G)
-    G = le_grafoNX_db('decisao')
+    artigo_artigo()
+#    G = cria_grafoNX_de_tabela(dbdec,'decisao')
+#    salva_grafoNX_db(G)
+#    G = le_grafoNX_db('decisao')
 #    salva_grafoNX_file(G)
 #    Gl = cria_grafoNX_de_tabela(dbdec,'lei_decisao')
 #    salva_grafoNX_file(Gl)
 #    G = le_grafoNX_file('decisao')
-    print G.order()
+    graph_stats(G)
 #    P.show()
 #    dyn_graph_lei(elist)
     
