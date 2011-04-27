@@ -11,10 +11,11 @@ from MySQLdb.cursors import CursorUseResultMixIn,  DictCursor, SSDictCursor,  SS
 db=MySQLdb.connect(host="E04324", user="root", passwd="password",db="Supremo")
 cur=db.cursor()
 reg_inicio = 0
-num_reg = 100
+num_reg = 30000
 consulta_banco = 'select decisao, tipo from Supremo.t_decisoes limit %s,%s;'%(reg_inicio, num_reg)
 match_string1 = r"""unân[A-Z,a-z]{3,8}|unan[A-Z,a-z]{3,8}|UNÂN[A-Z,a-z]{3,8}|UNAN[A-Z,a-z]{3,8}|Unân[A-Z,a-z]{3,8}|Unan[A-Z,a-z]{3,8}"""
-match_string2 = r"""MAIORIA|Maioria|maioria"""
+match_string2 = r"""(?i)MAIORIA"""
+#match_string3 = "Homologada", "erro material" (testar estas strings)
 
 def find_re(texto, crex):
     """
@@ -51,13 +52,13 @@ def busca_expressao1(cursor,  querydb, num_registros, expressao):
         sopa1 = BeautifulSoup(decisao[0].strip('[]'),  fromEncoding='ISO8859-1')
         sopa2 = BeautifulSoup(decisao[1],  fromEncoding='ISO8859-1')
         ementa = sopa1.findAll('pre')  # A ementa da decisao esta em uma marcacao HTML <pre>
-        match_obj = find_re(ementa, compile_obj) 
+        match_obj = find_re(ementa, compile_obj)
         if match_obj:                             # testa se achou a string recebida no texto
             lista_matches.append((str(match_obj[0]), str(sopa2)))
             for match in match_obj: conj_matches.add(str(match))
             num_matches +=1
         else:
-            lista_nomatch.append((str(ementa), str(sopa2)))
+            lista_nomatch.append((ementa, str(sopa2)))
             num_nomatches +=1
     cursor.close()
     return num_matches,  conj_matches,  lista_matches,  lista_nomatch,  num_nomatches
@@ -79,25 +80,30 @@ def busca_expressao2(tupla_resultado1, expressao):
     #locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8') 
     compile_obj = re.compile(expressao)#, re.LOCALE)
     for tupla in tupla_resultado1:
-        for texto in tupla[0]:
-            match_obj = find_re(texto, compile_obj) 
-            if match_obj:                             # testa se achou a string recebida no texto
-                lista_matches.append((str(match_obj[0]), str(tupla[1])))
-                for match in match_obj: conj_matches.add(str(match))
-                num_matches +=1
-            else:
-                lista_nomatch.append((str(texto), str(tupla[1])))
-                num_nomatches +=1
+        match_obj = find_re(tupla[0], compile_obj)
+        if match_obj:                             # testa se achou a string recebida no texto
+            lista_matches.append((str(match_obj[0]), str(tupla[1])))
+            for match in match_obj: conj_matches.add(str(match))
+            num_matches +=1
+        else:
+            lista_nomatch.append((tupla[0], str(tupla[1])))
+            num_nomatches +=1
     return num_matches,  conj_matches,  lista_matches,  lista_nomatch,  num_nomatches
 
-
+"""Main Code"""
 if __name__=="__main__":
     resultado1 = busca_expressao1(cur, consulta_banco,  num_reg,  match_string1)
     db.close()
-    print 'A(s) expressao(oes)',  list(resultado1[1]), 'ocorrem em', resultado1[0]
-    print 'dos', resultado1[0] + resultado1[4], 'registros analisados (', ((resultado1[0])/((resultado1[0] + resultado1[4]))*100),'%)'
+    print 'A(s) expressao(oes)',  list(resultado1[1])
+    print 'ocorrem em', resultado1[0], 'dos', resultado1[0] + resultado1[4], 'registros analisados'
+    print '(', ((resultado1[0])/((resultado1[0] + resultado1[4]))*100),'%)'
+    print
+    print 'Passamos a processar os',  resultado1[4], 'registros em que a primeira expressao nao foi encontrada...'
     lista_nomatches = resultado1[3]
     resultado2 = busca_expressao2(lista_nomatches, match_string2)
-    print 'A(s) expressao(oes)',  list(resultado2[1]), 'ocorrem em', resultado2[0]
-    print 'dos', resultado2[0] + resultado2[4], 'registros analisados (', ((resultado1[0])/((resultado2[0] + resultado2[4]))*100),'%)'
+    print 'A(s) expressao(oes)',  list(resultado2[1])
+    print 'ocorrem em', resultado2[0],'dos', resultado2[0] + resultado2[4], 'registros analisados'
+    print'(', ((resultado2[0])/((resultado2[0] + resultado2[4]))*100),'%)'
+    print 'ou seja, em', ((resultado2[0])/((resultado1[0] + resultado1[4]))*100),'% dos', resultado1[0] + resultado1[4], 'registros totais analisados'
+    #print resultado2[3]
 """End"""
