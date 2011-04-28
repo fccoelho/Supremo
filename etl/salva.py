@@ -4,6 +4,7 @@ Modulo para criar Tabela e salvar dados de decisoes do subremo
 """
 from elixir import ManyToOne, Date, Integer, OneToMany, Entity, using_options, Field, create_all, setup_all, metadata, session, Unicode
 import json
+import networkx as nx
 import sys
 
 
@@ -16,6 +17,11 @@ class SalvaNoBanco:
     """
     def __init__(self):
         self.outrasleis = set([])
+        self.grafo_dec = nx.Graph(nome='decisao')
+        self.grafo_lei = nx.Graph(nome='lei')
+        self.grafo_artigo = nx.Graph('artigo')
+        self.grafo_inciso = nx.Graph('inciso')
+        self.grafo_letra = nx.Graph('letra')
         self.gabarito = {"esfera": ["LEG-INT", "LEG-FED", "LEG-EST","LEG-MUN","LEG-DIS", ], 
                                 "lei": ["CF", "CF-", u"CONSTITUIÇÃO FEDERAL",  "EMC-", 
                                             "LEI-","LEI", 
@@ -106,8 +112,11 @@ class SalvaNoBanco:
         salva no banco 
         """
         leisjson = json.loads(leisjson.decode('iso-8859-1'))
-#        print leisjson.items()
+#      Cria decisao no banco
         D = Decisao(id=dec_id, processo=processo, tipo=tipo, data_dec=datadec, data_pub=datapub, 
+                    UF=UF, proc_classe = proc_classe, relator=relator, duracao=duracao, origem=origem)
+        # Adiciona decisao  ao grafo
+        self.grafo_dec.add_node(dec_id, processo=processo, tipo=tipo, data_dec=datadec, data_pub=datapub, 
                     UF=UF, proc_classe = proc_classe, relator=relator, duracao=duracao, origem=origem)
         for k, v in leisjson.iteritems(): #itera sobre as esferas citadas: Federal, Estadual, etc
             for l in v: # Itera sobre as leis citadas na dada esfera.
@@ -115,6 +124,11 @@ class SalvaNoBanco:
             
     def commit_data(self):
         session.commit()
+    
+    def salva_grafo_no_banco(self):
+        """salva o grafo com um Blob (pickle) no banco"""
+        pass
+        
 
 #===Modelos===
 
