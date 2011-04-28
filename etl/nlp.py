@@ -8,10 +8,10 @@ import MySQLdb
 from MySQLdb.cursors import CursorUseResultMixIn,  DictCursor, SSDictCursor,  SSCursor
 
 """Variaveis Globais"""
-db=MySQLdb.connect(host="E04324", user="root", passwd="password",db="Supremo")
+db=MySQLdb.connect(host="E04324@fgv.br", user="root", passwd="password",db="Supremo")
 cur=db.cursor()
 reg_inicio = 0
-num_reg = 30000
+num_reg = 10
 consulta_banco = 'select decisao, tipo from Supremo.t_decisoes limit %s,%s;'%(reg_inicio, num_reg)
 match_string1 = r"""unân[A-Z,a-z]{3,8}|unan[A-Z,a-z]{3,8}|UNÂN[A-Z,a-z]{3,8}|UNAN[A-Z,a-z]{3,8}|Unân[A-Z,a-z]{3,8}|Unan[A-Z,a-z]{3,8}"""
 match_string2 = r"""(?i)MAIORIA"""
@@ -29,7 +29,54 @@ def find_re(texto, crex):
         matches.extend(crex.findall(str(t)))
     return matches
     
-
+def busca_expressoes(cursor,  querydb, num_registros, expressao1,  expressao2=''):
+    """
+    Recebe 1 ou 2 expressao(oes). Compila com a funcao <find_re>. Recebe um cursor de conexao ao banco.
+    Recebe uma query para este banco e executa a query limitada pelo numero de registros recebido
+    Busca por ocorrencias desta(s) expressao(oes) compilada nos resultados.
+    Devolve # registros que satisfazem e # registros que não satisfazem
+    Devolve conjunto dos matches compilados encontrados em todos os registros para cada expressao
+    Devolve, para cada expressao listas de tuplas, associando os registros aos tipos de decisao.
+    """
+    num_matches1 = 0
+    num_nomatches1 = 0
+    lista_matches1 = []
+    lista_nomatch1 = []
+    conj_matches1 = set()
+    compile_obj1 = re.compile(expressao1)
+    if expressao2:                                             # So executa bloco se forem passadas duas expressoes
+        num_matches2 = 0
+        num_nomatches2 = 0
+        lista_matches2 = []
+        lista_nomatch2 = []
+        conj_matches2 = set()
+        compile_obj2 = re.compile(expressao2)
+    cursor.execute(querydb)
+    registros_db = cursor.fetchmany(num_registros)
+    for registro in registros_db:                       #registro eh uma tupla (decisao,tipo), de acordo com as tabelas do banco
+        decisao_texto = BeautifulSoup(registro[0].strip('[]'),  fromEncoding='ISO8859-1')
+        decisao_tipo = BeautifulSoup(registro[1],  fromEncoding='ISO8859-1')
+        ementa = decisao_texto.findAll('pre')   # A ementa esta envolta em uma marcacao HTML <pre> no texto da decisao
+        match_obj1 = find_re(ementa, compile_obj1)
+        if match_obj1:                                      # testa se achou a primeira expressao recebida no texto
+            lista_matches1.append((str(match_obj1[0]), str(decisao_tipo)))
+            for match in match_obj1: conj_matches1.add(str(match))
+            num_matches1 +=1
+        elif expressao2:                                    # So executa bloco se forem passadas duas expressoes
+            match_obj2 = find_re(ementa, compile_obj2)
+            if match_obj2:                                  # testa se achou a segunda expressao recebida no texto
+                lista_matches2.append((str(match_obj2[0]), str(decisao_tipo)))
+                for match in match_obj2: conj_matches2.add(str(match))
+                num_matches2 +=1
+        else:                                                   # se nao achou nenhuma das expressoes
+            lista_nomatch.append((ementa, str(decisao_tipo)))
+            num_nomatches +=1
+    cursor.close()
+    if expressao2:
+        return lista_nomatch,  num_nomatches,  num_matches1,  conj_matches1,  lista_matches1, num_matches2,  conj_matches2,  lista_matches2
+    else:
+        return lista_nomatch,  num_nomatches,  num_matches1,  conj_matches1,  lista_matches1
+        
 def busca_expressao1(cursor,  querydb, num_registros, expressao):
     """
     Recebe uma expressao. Compila com a funcao <find_re>. Recebe um cursor de conexao ao banco.
