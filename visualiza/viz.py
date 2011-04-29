@@ -11,12 +11,13 @@ import time
 import cProfile 
 import datetime
 from lebanco import *
+from report import compila_relatorio
 
 from matplotlib import pyplot as P
 import numpy as np
 from webviz import blob_map,  annot_TS
 
-#Cria dicionrio de coordenadas dos centroides dos estados
+#Cria dicionario de coordenadas dos centroides dos estados
 centroides = {}
 with open('centroides_estados.csv', 'r') as f:
     for s in f:
@@ -110,7 +111,7 @@ class AnalisaCitacoes:
         return alc
         
     @timeit
-    def espacial(self,  view=False):
+    def espacial(self):
         """
         generates a blob map with counts decisions by state
         """

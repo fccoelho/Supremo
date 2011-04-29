@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Project SYSTEM "Project-4.6.dtd">
+<!-- eric4 project file for project Supremo -->
+<!-- Saved: 2011-04-27, 18:31:36 -->
+<!-- Copyright (C) 2011 Flavio Coelho, fccoelho@fgv.br -->
+<Project version="4.6">
+  <Language>en_US</Language>
+  <ProgLanguage mixed="0">Python</ProgLanguage>
+  <ProjectType>Qt4</ProjectType>
+  <Description></Description>
+  <Version>0.1</Version>
+  <Author>Flavio Coelho</Author>
+  <Email>fccoelho@fgv.br</Email>
+  <Sources>
+    <Source>__init__.py</Source>
+    <Source>visualiza/__init__.py</Source>
+    <Source>visualiza/gviz_api.py</Source>
+    <Source>visualiza/webviz.py</Source>
+    <Source>visualiza/viz.py</Source>
+    <Source>visualiza/lebanco.py</Source>
+    <Source>visualiza/ubigraph.py</Source>
+    <Source>visualiza/grafos.py</Source>
+    <Source>etl/__init__.py</Source>
+    <Source>etl/limpa.py</Source>
+    <Source>etl/nlp.py</Source>
+    <Source>etl/salva.py</Source>
+    <Source>db_sen_grafo/sql/000x-cria_vw_gr_artigo_artigo.sql</Source>
+    <Source>db_sen_grafo/sql/000x-cria_vw_gr_lei_lei.sql</Source>
+    <Source>db_sen_grafo/sql/0001-importaTabela-lei_decisao.sql</Source>
+    <Source>db_sen_grafo/sql/0002-criaTabela-lei.sql</Source>
+    <Source>db_sen_grafo/sql/0003-insereId_correto-lei.sql</Source>
+    <Source>db_sen_grafo/sql/0004-insere-lei_id-lei_decisao.sql</Source>
+    <Source>db_sen_grafo/sql/0005-criaTabela-artigo.sql</Source>
+    <Source>db_sen_grafo/sql/0006-criaTabela-artigo_lei_decisao.sql</Source>
+    <Source>db_sen_grafo/sql/0007-update_lei_sem_acentos.sql</Source>
+    <Source>db_sen_grafo/sql/0007-update_lei.sql</Source>
+    <Source>db_sen_grafo/sql/join_matrix.sql</Source>
+    <Source>db_sen_grafo/sql/matrix_testes.sql</Source>
+    <Source>db_sen_grafo/sql/matrix-gr_ano_lei.sql</Source>
+    <Source>db_sen_grafo/sql/matrix-gr_ministro_lei.sql</Source>
+    <Source>db_sen_grafo/sql/README</Source>
+    <Source>db_sen_grafo/src/0004-create_table_artigo_lei_decisao.py</Source>
+    <Source>db_sen_grafo/src/0002-update_count_per_node.py</Source>
+    <Source>db_sen_grafo/src/0003-create_table_artigo.py</Source>
+    <Source>db_sen_grafo/src/0001-create_table_gr_lei_lei.py</Source>
+    <Source>db_sen_grafo/src/0005-create_table_gr_artigo_artigo.py</Source>
+    <Source>visualiza/test_grafos.py</Source>
+  </Sources>
+  <Forms>
+  </Forms>
+  <Translations>
+  </Translations>
+  <Resources>
+  </Resources>
+  <Interfaces>
+  </Interfaces>
+  <Others>
+  </Others>
+  <Vcs>
+    <VcsType>None</VcsType>
+  </Vcs>
+  <FiletypeAssociations>
+    <FiletypeAssociation pattern="*.ui" type="FORMS" />
+    <FiletypeAssociation pattern="*.idl" type="INTERFACES" />
+    <FiletypeAssociation pattern="*.qm" type="TRANSLATIONS" />
+    <FiletypeAssociation pattern="*.ptl" type="SOURCES" />
+    <FiletypeAssociation pattern="*.pyw" type="SOURCES" />
+    <FiletypeAssociation pattern="*.ui.h" type="FORMS" />
+    <FiletypeAssociation pattern="*.ts" type="TRANSLATIONS" />
+    <FiletypeAssociation pattern="*.py" type="SOURCES" />
+    <FiletypeAssociation pattern="*.qrc" type="RESOURCES" />
+  </FiletypeAssociations>
+  <Checkers>
+    <CheckersParams>
+      <dict>
+        <key>
+          <string>PYLINT</string>
+        </key>
+        <value>
+          <dict>
+            <key>
+              <string>dialogReport</string>
+            </key>
+            <value>
+              <bool>True</bool>
+            </value>
+            <key>
+              <string>enableBasic</string>
+            </key>
+            <value>
+              <bool>True</bool>
+            </value>
+            <key>
+              <string>enableClasses</string>
+            </key>
+            <value>
+              <bool>False</bool>
+            </value>
+            <key>
+              <string>enableDesign</string>
+            </key>
+            <value>
+              <bool>False</bool>
+            </value>
+            <key>
+              <string>enableExceptions</string>
+            </key>
+            <value>
+              <bool>False</bool>
+            </value>
+            <key>
+              <string>enableFormat</string>
+            </key>
+            <value>
+              <bool>False</bool>
+            </value>
+            <key>
+              <string>enableImports</string>
+            </key>
+            <value>
+              <bool>False</bool>
+            </value>
+            <key>
+              <string>enableMetrics</string>
+            </key>
+            <value>
+              <bool>True</bool>
+            </value>
+            <key>
+              <string>enableMiscellaneous</string>
+            </key>
+            <value>
+              <bool>False</bool>
+            </value>
+            <key>
+              <string>enableNewstyle</string>
+            </key>
+            <value>
+              <bool>False</bool>
+            </value>
+            <key>
+              <string>enableRPython</string>
+            </key>
+            <value>
+              <bool>False</bool>
+            </value>
+            <key>
+              <string>enableSimilarities</string>
+            </key>
+            <value>
+              <bool>False</bool>
+            </value>
+            <key>
+              <string>enableTypecheck</string>
+            </key>
+            <value>
+              <bool>False</bool>
+            </value>
+            <key>
+              <string>enableVariables</string>
+            </key>
+            <value>
+              <bool>False</bool>
+            </value>
+            <key>
+              <string>htmlReport</string>
+            </key>
+            <value>
+              <bool>False</bool>
+            </value>
+            <key>
+              <string>txtReport</string>
+            </key>
+            <value>
+              <bool>False</bool>
+            </value>
+          </dict>
+        </value>
+      </dict>
+    </CheckersParams>
+  </Checkers>
+</Project>
