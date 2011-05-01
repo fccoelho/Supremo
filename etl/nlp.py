@@ -89,37 +89,17 @@ def busca_expressoes(cursor,  querydb, num_registros, expressao1,  expressao2=''
         return lista_nomatches,  num_nomatches,\
                     dic_matches1_tipo, num_matches1,  conj_matches1, lista_matches1
 
-def plota_grafico(N,  ):
-    """
-    http://matplotlib.sourceforge.net/examples/api/barchart_demo.html
-    """
-    menMeans = (20, 35, 30, 35, 27)
-    menStd =   (2, 3, 4, 1, 2)
-    ind = np.arange(N)  # the x locations for the groups
-    width = 0.35       # the width of the bars
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-    rects1 = ax.bar(ind, menMeans, width, color='r', yerr=menStd)
-    womenMeans = (25, 32, 34, 20, 25)
-    womenStd =   (3, 5, 2, 3, 3)
-    rects2 = ax.bar(ind+width, womenMeans, width, color='y', yerr=womenStd)
-    # add some
-    ax.set_ylabel('Scores')
-    ax.set_title('Scores by group and gender')
-    ax.set_xticks(ind+width)
-    ax.set_xticklabels( ('G1', 'G2', 'G3', 'G4', 'G5') )
-    ax.legend( (rects1[0], rects2[0]), ('Men', 'Women') )
 
-def autolabel(rects):
-    """
-    http://matplotlib.sourceforge.net/examples/api/barchart_demo.html
-    """
-    # attach some text labels
-    for rect in rects:
-        height = rect.get_height()
-        ax.text(rect.get_x()+rect.get_width()/2., 1.05*height, '%d'%int(height),
-                ha='center', va='bottom')
-
+def desenha_grafico (dict1,  dict2={})
+    val = dict1.    # the bar lengths
+    pos = arange(5)+.5    # the bar centers on the y axis
+    figure(1)
+    barh(pos,val, align='center')
+    yticks(pos, ('Tom', 'Dick', 'Harry', 'Slim', 'Jim'))
+    xlabel('Performance')
+    title('Resultados por tipo de decisao')
+    grid(True)
+    show()
 
 """Main Code"""
 if __name__=="__main__":
@@ -134,7 +114,5 @@ if __name__=="__main__":
         print 'ocorrem em', resultado[7],'dos', num_reg, 'registros analisados'
         print'(', ((resultado[7]/num_reg)*100),'%)'
         print resultado[6]
-    #autolabel(rects1)
-    #autolabel(rects2)
-    #plt.show()
+    #desenha_grafico(resultado[2], resultado[6])
 """End"""

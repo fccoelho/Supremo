@@ -46,6 +46,7 @@
     <Source>visualiza/estados.kml</Source>
     <Source>visualiza/kmlgen.py</Source>
     <Source>visualiza/mapas.py</Source>
+    <Source>visualiza/cherry.py</Source>
   </Sources>
   <Forms>
   </Forms>
