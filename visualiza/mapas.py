@@ -1,7 +1,8 @@
 # -*- coding:utf-8 -*-
 """
-cria visualizações em mapas 
-@Autor: Flávio
+Cria visualizações em mapas
+@Autor: Flávio C Coelho
+@Data: abril/2011
 """
 from sqlalchemy.ext.sqlsoup import SqlSoup
 from matplotlib.colors import rgb2hex

@@ -14,11 +14,15 @@ from random import *
 leaves=[]
 fruits=[]
 tdata = materials.loadTGA('folhas.tga')
-solo = materials.texture(data=tdata,
-                          interpolate=True)
+solo = materials.texture(data=tdata,mapping='rectangular',mipmap=True,
+                          interpolate=False)
 
 def random_vector():
     return vector(random(),random(),random())
+
+class Solo:
+    def __init__(self, frm,pos,w,l):
+        box(frame=frm,pos=(pos),width=w,length=l,height=0.11,material=materials.rough, color=color.green)
 
 class Fruta:
     """
@@ -35,7 +39,13 @@ class Folha:
     """
     Modelo de folha
     """
-    def __init__(self, frm, pai, eixo):
+    def __init__(self, frm, pai, eixo, cor=color.green):
+        """
+        frm: frame da arvore
+        pai: ramo pai
+        eixo: eixo da folha
+        cor: cor da folha
+        """
         na=norm(pai.eixo)#Direção da folha
         ex=cross((0,1,0),na)
         ey=cross(ex,na)
@@ -43,7 +53,7 @@ class Folha:
         ey=0.045*ey
         pai.folhas.append(self)
         npf = len(pai.folhas)
-        ar = 2*pi/npf*(npf+1)#angulo de rotacao da folha
+        ar = 2*pi*random()#angulo de rotacao da folha
         #print pai.raio,ex,na,ey,mag(ey)
         points=[(0.0,0.1),(0.2,0.3),(0.4,0.5),(0.8,0.3),(1.0,0.0),(0.8,-0.3),(0.4,-0.5),(0.2,-0.3),(0.0,-0.1)]
         f=frame(frame=frm, pos=pai.fim)
@@ -69,7 +79,7 @@ class Ramo(object):
         self.pos = pai.fim
         self.frm = frm
         #print n, (2.0*pi/n)*(n-1)+pi/6.0*random()
-        self.eixo = rotate(rotate(s,axis=pai.eixo,angle=(2.0*pi/n)*(n-1)+pi/6.0*random()), axis=pai.eixo,angle=pi/4.0*(random()-0.5))
+        self.eixo = rotate(rotate(s,axis=pai.eixo,angle=2.0*pi*random()), axis=pai.eixo,angle=pi/4.0*(random()-0.5))
         self.cor = cor
         self.isTronco = False
         self.fim = self.pos+self.eixo
@@ -82,11 +92,21 @@ class Ramo(object):
     def raio(self):
         return .5*0.11*mag(self.eixo)**1.5
 
+    def add_folha(self,):
+        """Adiciona uma folha ao ramo de nome ramo"""
+        pai = self
+        eixo = pai.v*0.5
+        f = Folha(self.frm,pai, eixo)
+        self.folhas.append(f)
+        return f
+
 class Arvore(object):
     """"""
+    #TODO: implementar crescimento da arvore
     _raio = 0
-    def __init__(self, altura=0.8, pos=None, cor=(0.7,0.3,0.05)):
+    def __init__(self, nome='',altura=0.8, pos=None, cor=(0.7,0.3,0.05)):
         """"""
+        self.nome = nome
         self.frm = frame(pos=(0,-0.8,0))
         self.cor = cor
         self.ramos = {}
@@ -123,6 +143,7 @@ class Arvore(object):
         else:
             pai = self.ramos[pai]
         ramo = Ramo(nome,pai, self.frm, cor, ml, mr, e)
+        return ramo
         
 
     def add_folha(self, ramo):
@@ -180,9 +201,9 @@ if __name__=="__main__":
     #A2 = Arvore(1,vector(2,0,2))
     #base
     cylinder(frame=A.frm,pos=(0,-0.1,0), axis=(0,0.11,0), color=(0.8,0.5,0.1), material=solo)
-    A.add_ramo('ramo1','tronco', (0.7,0.3,0.05), 0.6, 0.6, pi/3.0,)
-    A.add_ramo('ramo2','tronco', (0.7,0.3,0.05), 0.6, 0.6, pi/3.0,)
-    A.add_ramo('ramo3','tronco', (0.7,0.3,0.05), 0.6, 0.6, pi/3.0,)
+    A.add_ramo('ramo1','tronco', (0.7,0.3,0.05), 0.6, 0.6, pi/3.0)
+    A.add_ramo('ramo2','tronco', (0.7,0.3,0.05), 0.6, 0.6, pi/3.0)
+    A.add_ramo('ramo3','tronco', (0.7,0.3,0.05), 0.6, 0.6, pi/3.0)
     [A.add_folha('ramo1') for i in range(15)]
     [A.add_folha('ramo2') for i in range(15)]
     [A.add_folha('ramo3') for i in range(15)]
