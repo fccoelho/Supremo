@@ -15,10 +15,6 @@ from matplotlib.ticker import MaxNLocator
 
 """Variaveis Globais"""
 db=MySQLdb.connect(host="E04324.fgv.br", user="root", passwd="password",db="Supremo")
-cur=db.cursor()
-reg_inicio = 0
-num_reg = 50000
-consulta_banco = 'select decisao, tipo from Supremo.t_decisoes limit %s,%s;'%(reg_inicio, num_reg)
 match_string1 = r"""unân[A-Z,a-z]{3,8}|unan[A-Z,a-z]{3,8}|UNÂN[A-Z,a-z]{3,8}|UNAN[A-Z,a-z]{3,8}|Unân[A-Z,a-z]{3,8}|Unan[A-Z,a-z]{3,8}"""
 match_string2 = r"""(?i)MAIORIA"""
 #match_string3 = "Homologada", "erro material" (testar estas strings)
@@ -44,6 +40,8 @@ def busca_expressoes(cursor,  querydb, num_registros, expressao1,  expressao2=''
     Devolve conjunto dos matches compilados encontrados em todos os registros para cada expressao
     Devolve, para cada expressao listas de tuplas, associando os registros aos tipos de decisao.
     """
+    cur=db.cursor(cursorclass=SSDictCursor)
+    #cur=db.cursor()
     num_nomatches = 0
     lista_nomatches = []
     conj_decisao_tipo = set()
@@ -58,27 +56,35 @@ def busca_expressoes(cursor,  querydb, num_registros, expressao1,  expressao2=''
         lista_matches2 = []
         conj_matches2 = set()
         compile_obj2 = re.compile(expressao2)
-    cursor.execute(querydb)
-    registros_db = cursor.fetchmany(num_registros)
-    for registro in registros_db:                       #registro eh uma tupla (decisao,tipo), de acordo com as tabelas do banco
-        decisao_texto = BeautifulSoup(registro[0].strip('[]'),  fromEncoding='ISO8859-1')
-        ementa = decisao_texto.findAll('pre')   # A ementa esta envolta em uma marcacao HTML <pre> no texto da decisao
-        match_obj1 = find_re(ementa, compile_obj1)
-        decisao_tipo = registro[1]
-        conj_decisao_tipo.add(decisao_tipo)
-        if match_obj1:                                      # testa se achou a primeira expressao recebida no texto
-            lista_matches1.append((match_obj1, decisao_tipo))
-            for match in match_obj1: conj_matches1.add(match)
-            num_matches1 +=1
-        elif expressao2:                                    # So executa bloco se forem passadas duas expressoes
-            match_obj2 = find_re(ementa, compile_obj2)
-            if match_obj2:                                  # testa se achou a segunda expressao recebida no texto
-                lista_matches2.append((match_obj2, decisao_tipo))
-                for match in match_obj2: conj_matches2.add(match)
-                num_matches2 +=1
-        else:                                                   # se nao achou nenhuma das expressoes
-            lista_nomatches.append((ementa, decisao_tipo))
-            num_nomatches +=1
+
+#cursor.execute(querydb)
+    reg_inicio = 0
+    q_num_reg = cursor.execute('select count(*) from Supremo.t_decisoes')
+    num_reg = cursor.execute('select count(*) from Supremo.t_decisoes')
+    while inicio < num:
+        cursor.execute('select decisao, tipo from Supremo.t_decisoes limit %s,%s;'%(reg_inicio, num_reg))
+        registros_db=cursor.fetchone() # usando Fetchone para economizar memoria
+        while registros_db != None:
+            for registro in registros_db:                       #registro eh uma tupla (decisao,tipo), de acordo com as tabelas do banco
+                decisao_texto = BeautifulSoup(registro[0].strip('[]'),  fromEncoding='ISO8859-1')
+                ementa = decisao_texto.findAll('pre')   # A ementa esta envolta em uma marcacao HTML <pre> no texto da decisao
+                match_obj1 = find_re(ementa, compile_obj1)
+                decisao_tipo = registro[1]
+                conj_decisao_tipo.add(decisao_tipo)
+                if match_obj1:                                      # testa se achou a primeira expressao recebida no texto
+                    lista_matches1.append((match_obj1, decisao_tipo))
+                    for match in match_obj1: conj_matches1.add(match)
+                    num_matches1 +=1
+                elif expressao2:                                    # So executa bloco se forem passadas duas expressoes
+                    match_obj2 = find_re(ementa, compile_obj2)
+                    if match_obj2:                                  # testa se achou a segunda expressao recebida no texto
+                        lista_matches2.append((match_obj2, decisao_tipo))
+                        for match in match_obj2: conj_matches2.add(match)
+                        num_matches2 +=1
+                else:                                                   # se nao achou nenhuma das expressoes
+                    lista_nomatches.append((ementa, decisao_tipo))
+                    num_nomatches +=1
+        reg_inicio +=1000
     cursor.close()
     for match, tipo in lista_matches1: dic_matches1_tipo[tipo] = (dic_matches1_tipo.get(tipo, 0) +1)
     if num_matches2:
@@ -101,7 +107,7 @@ def desenha_grafico (dict):
     yticks(pos, (dict.keys()))
     barh(pos,val, align='center')
     xlabel('Decisoes')
-    title('Votacao por tipo de decisao')
+    title('Unanimidade por tipo de decisao')
     grid(True)
     
 """Main Code"""
