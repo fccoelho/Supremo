@@ -24,11 +24,12 @@ def random_vector():
 class Bosque(object):
     """Cria uma cena bosque com todos os objetos incluidos """
     def __init__(self, nome, raio=10):
-        self.scene = display(title='Bosque do Supremo - %s'%nome,
-        x=0, y=0, width=640, height=480,
-        center=(0,0,0), background=(0,0,0))
+        self.scene = display(title=nome,x=0, y=0, width=600, height=400,
+     center=(0,0,0),forward=(0,-1,-2), background=(0,0,0))
+#        self.scene.title='Bosque do Supremo - %s'%nome
         self.scene.visible=0
         self.frame = frame()
+#        label(text=nome,pos=(0,5,0), depth=-0.3, color=color.blue)
         self.solo = cylinder(frame=self.frame,pos=(0,-0.1,0), axis=(0,0.11,0),radius=raio, color=(0.8,0.5,0.1), material=solo)
 
 

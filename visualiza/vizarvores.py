@@ -67,5 +67,5 @@ if __name__ == "__main__":
     dbgrafo = SqlSoup("%s/SEN_Grafo" % MySQLServer)
     dbsupremo =  SqlSoup("%s/Supremo_new" % MySQLServer)
     dbdec = SqlSoup("%s/STF_Analise_Decisao" % MySQLServer)
-#    decisoes_por_classe()
+#    decisoes_por_classe(1990)
     anima_bosque()
