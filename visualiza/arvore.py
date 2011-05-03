@@ -135,7 +135,7 @@ class Ramo(object):
         np = n/20 if n>20 else 1
         for m in range(np):
             r = self.arvore.add_ramo(self.nome+'p%s'%m, self, (0, .5, 0), 0.2, 0.6, pi/3.0)
-            for i in range(min(5,n)):
+            for i in range(min(10,n)):
                 if len(folhas)>n:
                     return folhas
                 f = self.add_folha(r,c.next())
