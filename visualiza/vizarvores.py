@@ -24,7 +24,7 @@ def decisoes_por_classe(ano):
     bosque.scene.select()
     #cria arvores
     alts = np.array([d[3] for d in decs], 'float64')
-    alts  = alts/alts.max()*2+0.8 #alturas das árvores.
+    alts  = (alts/alts.max())*2+0.8 #alturas das árvores.
     ramosdict = defaultdict(lambda:defaultdict(lambda:set()))
     for d,a in zip(decs,alts):
         if d[0] in arvores or (not d[0]):
@@ -67,5 +67,5 @@ if __name__ == "__main__":
     dbgrafo = SqlSoup("%s/SEN_Grafo" % MySQLServer)
     dbsupremo =  SqlSoup("%s/Supremo_new" % MySQLServer)
     dbdec = SqlSoup("%s/STF_Analise_Decisao" % MySQLServer)
-#    decisoes_por_classe()
+#    decisoes_por_classe(1990)
     anima_bosque()

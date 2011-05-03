@@ -14,7 +14,7 @@ from matplotlib.patches import Polygon
 from matplotlib.ticker import MaxNLocator
 
 """Variaveis Globais"""
-db=MySQLdb.connect(host="E04324.fgv.br", user="root", passwd="password",db="Supremo")
+db = MySQLdb.connect(host="E04324.fgv.br", user="root", passwd="password",db="Supremo_new")
 match_string1 = r"""unân[A-Z,a-z]{3,8}|unan[A-Z,a-z]{3,8}|UNÂN[A-Z,a-z]{3,8}|UNAN[A-Z,a-z]{3,8}|Unân[A-Z,a-z]{3,8}|Unan[A-Z,a-z]{3,8}"""
 match_string2 = r"""(?i)MAIORIA"""
 #match_string3 = "Homologada", "erro material" (testar estas strings)
@@ -31,7 +31,7 @@ def find_re(texto, crex):
         matches.extend(crex.findall(str(t)))
     return matches
     
-def busca_expressoes(cursor, expressao1, expressao2=''):
+def busca_expressoes(dbase, expressao1, expressao2=''):
     """
     Recebe uma conexao ao banco. Determina numero de registros da tabela
     Recebe 1 ou 2 expressao(oes). Compila com a funcao <find_re>.
@@ -56,15 +56,16 @@ def busca_expressoes(cursor, expressao1, expressao2=''):
         lista_matches2 = []
         conj_matches2 = set()
         compile_obj2 = re.compile(expressao2)
-    
+    dbcursor=dbase.cursor()
+    dbcursor.execute('select count(*) from Supremo_new.t_decisoes') #determina num registros na tabela
+    num_reg = dbcursor.fetchone()[0]  
+    dbcursor.close()
     reg_inicio = 0
-    cur=db.cursor(cursorclass=SSDictCursor) # este cursor deixa os resultados no lado servidor
-    cur.execute('select count(*) from Supremo.t_decisoes') #determina num. registros na tabela
-    num_reg = cur.fetchone()                                   #rever!!!
+    dbcursor=dbase.cursor()
     while reg_inicio < num_reg:                               # estrategia para nao estourar a memoria, processando 1000 de cada vez
-        cur.execute('select decisao, tipo from Supremo.t_decisoes limit %s,%s;'%(reg_inicio, 1000))
-        registros_db=cur.fetchone()                          # usando Fetchone para economizar memoria
-        while registros_db != None:
+        dbcursor.execute('select decisao, tipo from Supremo_new.t_decisoes limit %s,%s;'%(reg_inicio, 1000))
+        registros_db=dbcursor.fetchmany(1)
+        while registros_db != ():
             for registro in registros_db:                       #registro eh uma tupla (decisao,tipo), de acordo com as tabelas do banco
                 decisao_texto = BeautifulSoup(registro[0].strip('[]'),  fromEncoding='ISO8859-1')
                 ementa = decisao_texto.findAll('pre')   # a ementa esta envolta em uma marcacao HTML <pre> no texto da decisao
@@ -84,17 +85,19 @@ def busca_expressoes(cursor, expressao1, expressao2=''):
                 else:                                                   # se nao achou nenhuma das expressoes
                     lista_nomatches.append((ementa, decisao_tipo))
                     num_nomatches +=1
-        print 'Processando', reg_inicio, 'de', num_reg, 'registros' #para checar o andamento do processo
+                registros_db=dbcursor.fetchmany(1)
         reg_inicio +=1000
-    cursor.close()
+        print 'Processando', reg_inicio, 'de', num_reg, 'registros' #para checar o andamento do processo
+        print '(', ((reg_inicio/num_reg)*100),'%)'
+    dbcursor.close()
     for match, tipo in lista_matches1: dic_matches1_tipo[tipo] = (dic_matches1_tipo.get(tipo, 0) +1)
     if num_matches2:
         for match, tipo in lista_matches2: dic_matches2_tipo[tipo] = (dic_matches2_tipo.get(tipo, 0) +1)
-        return lista_nomatches,  num_nomatches,\
+        return num_reg, lista_nomatches,  num_nomatches,\
                     dic_matches1_tipo, num_matches1, conj_matches1, lista_matches1,\
                     dic_matches2_tipo, num_matches2, conj_matches2, lista_matches2
     else:
-        return lista_nomatches,  num_nomatches,\
+        return num_reg, lista_nomatches,  num_nomatches,\
                     dic_matches1_tipo, num_matches1,  conj_matches1, lista_matches1
 
 
@@ -113,18 +116,18 @@ def desenha_grafico (dict):
     
 """Main Code"""
 if __name__=="__main__":
-    resultado = busca_expressoes(cur, consulta_banco,  num_reg,  match_string1,  match_string2)
+    resultado = busca_expressoes(db, match_string1,  match_string2)
     db.close()
-    print 'A(s) expressao(oes)',  list(resultado[4])
-    print 'ocorrem em', resultado[3], 'dos', num_reg, 'registros analisados'
-    print '(', ((resultado[3]/num_reg)*100),'%)'
-    print resultado[2]   
-    desenha_grafico(resultado[2])
-    if len(resultado) >= 9:
-        print 'A(s) expressao(oes)',  list(resultado[8])
-        print 'ocorrem em', resultado[7],'dos', num_reg, 'registros analisados'
-        print'(', ((resultado[7]/num_reg)*100),'%)'
-        print resultado[6]
-        desenha_grafico(resultado[6])
+    print 'A(s) expressao(oes)',  list(resultado[5])
+    print 'ocorrem em', resultado[4], 'dos', resultado[0], 'registros analisados'
+    print '(', ((resultado[4]/resultado[0])*100),'%)'
+    print resultado[3]   
+    desenha_grafico(resultado[3])
+    if len(resultado) >= 10:
+        print 'A(s) expressao(oes)',  list(resultado[9])
+        print 'ocorrem em', resultado[8],'dos', resultado[0], 'registros analisados'
+        print'(', ((resultado[8]/resultado[0])*100),'%)'
+        print resultado[7]
+        desenha_grafico(resultado[7])
     show()
 """End"""
