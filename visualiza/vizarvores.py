@@ -16,39 +16,43 @@ import numpy as np
 MySQLServer = "mysql://root:password@E04324"
 
 def decisoes_por_classe():
-    Q = dbdec.execute("SELECT relator,tipo,proc_classe, count(*) FROM decisao WHERE DATE_FORMAT(data_dec,'%Y%')=1998 GROUP BY relator,tipo")
+    Q = dbdec.execute("SELECT relator,tipo,proc_classe, count(*) FROM decisao WHERE DATE_FORMAT(data_dec,'%Y%')=1998 GROUP BY relator,tipo,proc_classe")
     arvores = {}
     decs = Q.fetchall()
     #cria Bosque
-    bosque = Bosque('bosque1')
+    bosque = Bosque('bosque1',5)
     bosque.scene.select()
     #cria arvores
     alts = np.array([d[3] for d in decs], 'float64')
     alts  = alts/alts.max()+0.8 #alturas das árvores.
-
+    ramosdict = defaultdict(lambda:defaultdict(lambda:set()))
     for d,a in zip(decs,alts):
-        if d[0] in arvores or not d[0]:
+        if d[0] in arvores or (not d[0]):
             continue
-        r=random()*10
+        r=random()*5
         ang = random()*2*pi
-        arvores[d[0]]=Arvore(frm=bosque.frame,nome=d[0],altura=a,pos=vector(r*cos(ang),0,r*sin(ang)))
-    
-    #cria primeiro nível de ramos
-    for d in decs:
-        if not d[0]: continue
-        ramo1 = d[1] if d[1] else 'outros'
-        r1 = arvores[d[0]].add_ramo(ramo1,'tronco', (0.7,0.3,0.05), 0.5, 0.6, pi/3.0)
-        #Cria segundo nivel de ramos e folhas
-        classes_min = defaultdict(lambda:defaultdict(lambda:set()))
+        A = Arvore(frm=bosque.frame,nome=d[0],altura=a,pos=vector(r*cos(ang),0,r*sin(ang)))
+        arvores[d[0]]= A
+#        if d[0] not in ramosdict: ramosdict[d[0]]={}
+        #cria primeiro nível de ramos
         for d in decs:
-            if not d[0]: continue
-            if d[1] !=r1.nome: continue # cria só os ramos secundários de r1
-#            ramo1 = d[1] if d[1] else 'outros'
-            if d[2] in classes_min[d[0]][ramo1]:
-                continue
-            else:
-                r2 = arvores[d[0]].add_ramo(d[2],r1,(0.7,0.3,0.05), 0.45, 0.5, pi/3.0)
-                r2.add_folhas(d[3])
+            if not d[0] or d[0] != A.nome : continue
+            ramo1 = d[1] if d[1] else 'outros'
+            if ramo1 in ramosdict[d[0]]: continue
+            r1 = arvores[d[0]].add_ramo(ramo1,'tronco', (0.7,0.3,0.05), 0.5, 0.6, pi/3.0)
+            #Cria segundo nivel de ramos e folhas
+#            ramosdict[d[0]][ramo1]=set()
+            for d in decs:
+                if not d[0] or d[0] != A.nome : continue
+                d1 = d[1] if d[1] else 'outros'
+                if not d[0]: continue #Relator is None
+                if d1 !=r1.nome: continue # cria só os ramos secundários de r1
+                if d[2] in ramosdict[d[0]][ramo1]:
+                    continue
+                else:
+                    r2 = arvores[d[0]].add_ramo(d[2],r1,(0.7,0.3,0.05), 0.45, 0.5, pi/3.0)
+                    r2.add_folhas(d[3])
+                    ramosdict[d[0]][ramo1].add(d[2])
 
     bosque.scene.visible=1
 

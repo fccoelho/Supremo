@@ -23,8 +23,8 @@ def random_vector():
     
 class Bosque(object):
     """Cria uma cena bosque com todos os objetos incluidos """
-    def __init__(self, name, raio=10):
-        self.scene = display(title='Bosque do Supremo',
+    def __init__(self, nome, raio=10):
+        self.scene = display(title='Bosque do Supremo - %s'%nome,
         x=0, y=0, width=640, height=480,
         center=(0,0,0), background=(0,0,0))
         self.scene.visible=0
@@ -134,7 +134,7 @@ class Ramo(object):
         np = n/20 if n>20 else 1
         for m in range(np):
             r = self.arvore.add_ramo(self.nome+'p%s'%m, self, (0, .5, 0), 0.2, 0.6, pi/3.0)
-            for i in range(5):
+            for i in range(min(5,n)):
                 if len(folhas)>n:
                     return folhas
                 f = self.add_folha(r,c.next())
