@@ -16,21 +16,22 @@ leaves=[]
 fruits=[]
 tdata = materials.loadTGA('folhas.tga')
 solo = materials.texture(data=tdata,mapping='rectangular',mipmap=True,
-                          interpolate=False)
+                          interpolate=True)
 
 def random_vector():
     return vector(random(),random(),random())
     
 class Bosque(object):
     """Cria uma cena bosque com todos os objetos incluidos """
-    def __init__(self, name):
-        pass
+    def __init__(self, name, raio=10):
+        self.scene = display(title='Bosque do Supremo',
+        x=0, y=0, width=640, height=480,
+        center=(0,0,0), background=(0,0,0))
+        self.scene.visible=0
+        self.frame = frame()
+        self.solo = cylinder(frame=self.frame,pos=(0,-0.1,0), axis=(0,0.11,0),radius=raio, color=(0.8,0.5,0.1), material=solo)
 
 
-
-class Solo:
-    def __init__(self, frm,pos,w,l):
-        box(frame=frm,pos=(pos),width=w,length=l,height=0.11,material=materials.rough, color=color.green)
 
 class Fruta:
     """
@@ -130,7 +131,8 @@ class Ramo(object):
             c=cycle(cores)
         else:
             c = cycle([(0, 1, 0)])
-        for m in range(n/20):
+        np = n/20 if n>20 else 1
+        for m in range(np):
             r = self.arvore.add_ramo(self.nome+'p%s'%m, self, (0, .5, 0), 0.2, 0.6, pi/3.0)
             for i in range(20):
                 if len(folhas)>n:
@@ -145,10 +147,10 @@ class Arvore(object):
     """"""
     #TODO: implementar crescimento da arvore
     _raio = 0
-    def __init__(self, nome='',altura=0.8, pos=None, cor=(0.7,0.3,0.05)):
+    def __init__(self,frm, nome='',altura=0.8, pos=None, cor=(0.7,0.3,0.05)):
         """"""
         self.nome = nome
-        self.frm = frame(pos=(0,-0.8,0))
+        self.frm = frm
         self.cor = cor
         self.ramos = {}
         self.folhas = []
