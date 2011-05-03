@@ -46,7 +46,12 @@
     <Source>visualiza/estados.kml</Source>
     <Source>visualiza/kmlgen.py</Source>
     <Source>visualiza/mapas.py</Source>
-    <Source>visualiza/cherry.py</Source>
+    <Source>visualiza/arvore.py</Source>
+    <Source>visualiza/vizarvores.py</Source>
+    <Source>visualiza/report.py</Source>
+    <Source>etl/test_nlp.py</Source>
+    <Source>baixaleis/create_table_leis.py</Source>
+    <Source>baixaleis/__init__.py</Source>
   </Sources>
   <Forms>
   </Forms>

@@ -10,6 +10,7 @@ Baseado em exemplo cherry.py do site do visual Python
 from visual import *
 from math import *
 from random import *
+from itertools import cycle
 
 leaves=[]
 fruits=[]
@@ -19,6 +20,9 @@ solo = materials.texture(data=tdata,mapping='rectangular',mipmap=True,
 
 def random_vector():
     return vector(random(),random(),random())
+    
+class Bosque(object):
+    """Cria uma cena bosque com todos os objetos incluidos """
 
 class Solo:
     def __init__(self, frm,pos,w,l):
@@ -39,7 +43,7 @@ class Folha:
     """
     Modelo de folha
     """
-    def __init__(self, frm, pai, eixo, cor=color.green):
+    def __init__(self, frm, pai, cor=color.green):
         """
         frm: frame da arvore
         pai: ramo pai
@@ -144,36 +148,54 @@ class Arvore(object):
             pai = self.ramos[pai]
         ramo = Ramo(nome,pai, self.frm, cor, ml, mr, e)
         return ramo
-        
+
 
     def add_folha(self, ramo):
         """Adiciona uma folha ao ramo de nome ramo"""
         pai = self.ramos[ramo]
         eixo = pai.v*0.5
-        f = Folha(self.frm,pai, eixo)
+        f = Folha(self.frm,pai, cor)
         self.folhas.append(f)
+        return f
         
-def tree(frm,p,a,r,c,ml,mr,e,d):
-    q,v=p+a,ml*a*(0.8+0.4*random())
-    cylinder(frame=frm, pos=p, axis=a, radius=r, color=c)
-    sphere(frame=frm, pos=q, radius=r, color=c)
-    if d>0 and (d>1 or randrange(3)>0):
-        a1,a2=cross(a,(0,0,1)),cross(a,(1,0,0))
-        s=rotate(v,axis=a1,angle=e)
-        n=3+(randrange(10)>3)
-        if d<2: n=2
-        for i in range(n):
-            tree(frm, q, rotate(rotate(s,axis=a,angle=2.0*pi/n*i+pi/5.0/d*random()), axis=a,angle=pi/4.0*(random()-0.5)), mr*r, c, ml, mr, e, d-1)
-    else:
-        b=vector(0,-0.05,0)
-        if randrange(3)<1:
-            t=0.1*p+0.9*q
-            fruits.append(fruit(frm,t,rotate(b,axis=a,angle=pi*(1+random())/8.0),0.0025))
-            fruits.append(fruit(frm,t,rotate(b,axis=a,angle=-pi*(1+random())/8.0),0.0025))
-        for i in range(3):
-            l=leaf(frm,q,0.5*v)
-            l.rotate(axis=a,angle=2*pi*i/3.0)
-            leaves.append(l)
+    def add_folhas(self, ramo, n,  cores=[]):
+        """Adiciona multiplas (n) folhas"""
+        folhas = [] #lista de folhas criadas
+        if cores:
+            c=cycle(cores)
+        else:
+            c = cycle([(0, 1, 0)])
+        for m in range(n/20):
+            r=self.add_ramo(ramo+'p%s'%m, ramo, (0, .5, 0), 0.6, 0.6, pi/3.0)
+            for i in range(20):
+                if len(folhas)>n:
+                    return folhas
+                f = self.add_folha(r, c.next())
+                folhas.append(f)
+        return folhas
+            
+        
+#def tree(frm,p,a,r,c,ml,mr,e,d):
+#    q,v=p+a,ml*a*(0.8+0.4*random())
+#    cylinder(frame=frm, pos=p, axis=a, radius=r, color=c)
+#    sphere(frame=frm, pos=q, radius=r, color=c)
+#    if d>0 and (d>1 or randrange(3)>0):
+#        a1,a2=cross(a,(0,0,1)),cross(a,(1,0,0))
+#        s=rotate(v,axis=a1,angle=e)
+#        n=3+(randrange(10)>3)
+#        if d<2: n=2
+#        for i in range(n):
+#            tree(frm, q, rotate(rotate(s,axis=a,angle=2.0*pi/n*i+pi/5.0/d*random()), axis=a,angle=pi/4.0*(random()-0.5)), mr*r, c, ml, mr, e, d-1)
+#    else:
+#        b=vector(0,-0.05,0)
+#        if randrange(3)<1:
+#            t=0.1*p+0.9*q
+#            fruits.append(fruit(frm,t,rotate(b,axis=a,angle=pi*(1+random())/8.0),0.0025))
+#            fruits.append(fruit(frm,t,rotate(b,axis=a,angle=-pi*(1+random())/8.0),0.0025))
+#        for i in range(3):
+#            l=leaf(frm,q,0.5*v)
+#            l.rotate(axis=a,angle=2*pi*i/3.0)
+#            leaves.append(l)
 
 #scene.visible=0
 #fr=frame(pos=(0,-0.8,0))
@@ -204,9 +226,9 @@ if __name__=="__main__":
     A.add_ramo('ramo1','tronco', (0.7,0.3,0.05), 0.6, 0.6, pi/3.0)
     A.add_ramo('ramo2','tronco', (0.7,0.3,0.05), 0.6, 0.6, pi/3.0)
     A.add_ramo('ramo3','tronco', (0.7,0.3,0.05), 0.6, 0.6, pi/3.0)
-    [A.add_folha('ramo1') for i in range(15)]
-    [A.add_folha('ramo2') for i in range(15)]
-    [A.add_folha('ramo3') for i in range(15)]
+    [A.add_folha('ramo1') for i in range(20)]
+    [A.add_folha('ramo2') for i in range(20)]
+    [A.add_folha('ramo3') for i in range(20)]
     
     #f=Folha(A.frm,(0,-0.1,0),(0,0.11,0))
 
