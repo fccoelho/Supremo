@@ -43,7 +43,7 @@ for row in f:
         time.sleep(1)
         x = u.newVertex(color='#ff0000', shape='cube', label=str(ano))
         vertexAno[ano] = x
-        u.newEdge(vertexAno[ano-1], x, strength=-1, visible='false')
+        u.newEdge(vertexAno[ano-1], x, strength=1, visible='false')
         
         
     if row[1] not in vertexClasse:
@@ -52,7 +52,7 @@ for row in f:
         vertexClasse[row[1]] = [y, int(row[3])]
         
     u.newEdge(vertexClasse[row[1]][0], vertexAno[ano], strength=int(row[3]),
-              visible='true')
+              spline='true', visible='true')
     classe = vertexClasse[row[1]]
     classe[1] += int(row[3])
     classe[0].set(size=int(classe[1])*0.00001)
