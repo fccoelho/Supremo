@@ -15,16 +15,16 @@ import numpy as np
 
 MySQLServer = "mysql://root:password@E04324"
 
-def decisoes_por_classe():
-    Q = dbdec.execute("SELECT relator,tipo,proc_classe, count(*) FROM decisao WHERE DATE_FORMAT(data_dec,'%Y%')=1998 GROUP BY relator,tipo,proc_classe")
+def decisoes_por_classe(ano):
+    Q = dbdec.execute("SELECT relator,tipo,proc_classe, count(*) FROM decisao WHERE DATE_FORMAT(data_dec,'%Y%')="+"%s"%ano+" GROUP BY relator,tipo,proc_classe")
     arvores = {}
     decs = Q.fetchall()
     #cria Bosque
-    bosque = Bosque('bosque1',5)
+    bosque = Bosque(str(ano),5)
     bosque.scene.select()
     #cria arvores
     alts = np.array([d[3] for d in decs], 'float64')
-    alts  = alts/alts.max()+0.8 #alturas das árvores.
+    alts  = alts/alts.max()*2+0.8 #alturas das árvores.
     ramosdict = defaultdict(lambda:defaultdict(lambda:set()))
     for d,a in zip(decs,alts):
         if d[0] in arvores or (not d[0]):
@@ -55,9 +55,17 @@ def decisoes_por_classe():
                     ramosdict[d[0]][ramo1].add(d[2])
 
     bosque.scene.visible=1
+    return bosque
+
+def anima_bosque():
+    for y in range(1988,2010):
+        b = decisoes_por_classe(y)
+#        b.scene.visible=0
+#        del(b)
 
 if __name__ == "__main__":
     dbgrafo = SqlSoup("%s/SEN_Grafo" % MySQLServer)
     dbsupremo =  SqlSoup("%s/Supremo_new" % MySQLServer)
     dbdec = SqlSoup("%s/STF_Analise_Decisao" % MySQLServer)
-    decisoes_por_classe()
+#    decisoes_por_classe()
+    anima_bosque()
