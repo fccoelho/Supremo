@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Project SYSTEM "Project-4.6.dtd">
 <!-- eric4 project file for project Supremo -->
-<!-- Saved: 2011-05-02, 19:22:16 -->
+<!-- Saved: 2011-05-02, 22:14:56 -->
 <!-- Copyright (C) 2011 Flavio Coelho, fccoelho@fgv.br -->
 <Project version="4.6">
   <Language>en_US</Language>
@@ -47,7 +47,6 @@
     <Source>visualiza/test_grafos.py</Source>
     <Source>visualiza/estados.kml</Source>
     <Source>visualiza/kmlgen.py</Source>
-    <Source>visualiza/cherry.py</Source>
     <Source>etl/nlp2.py</Source>
   </Sources>
   <Forms>
