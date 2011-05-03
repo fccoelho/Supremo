@@ -24,7 +24,7 @@ def decisoes_por_classe(ano):
     bosque.scene.select()
     #cria arvores
     alts = np.array([d[3] for d in decs], 'float64')
-    alts  = (alts/alts.max())*3+0.8 #alturas das árvores.
+    alts  = (alts/alts.max())*2+0.8 #alturas das árvores.
     ramosdict = defaultdict(lambda:defaultdict(lambda:set()))
     for d,a in zip(decs,alts):
         if d[0] in arvores or (not d[0]):
