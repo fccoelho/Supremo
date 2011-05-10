@@ -5,10 +5,11 @@ import re
 
 def get_next_tag(string, inicio=0):
     r = []
-    r.append(re.search('>LIVRO|>TÍTULO|>CAPÍTULO|>SEÇÃO|>Subseção|Art.*?[0-9]+[^0-9-]', string[inicio:]))
+    r.append(re.search('>LIVRO|>TÍTULO|>CAPÍTULO|>SEÇÃO|>Subseção|Art[\n]?.*?[\n]?[0-9]+[^0-9-]',
+             string[inicio:]))
     r.append(re.search('Art\.[ \n][0-9]+-', string[inicio:]))
     r.append(re.search('[IVXLC]+[IVXLCl]*(&nbsp;| -)', string[inicio:]))
-    r.append(re.search('\n§|>§|&[^;]+;[ ]*§|Parágrafo único', string[inicio:]))
+    r.append(re.search('§|Parágrafo único', string[inicio:]))
     r.append(re.search('[\n\t >][a-h]\)', string[inicio:]))
     
     for i in range(5):
