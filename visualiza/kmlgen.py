@@ -14,6 +14,9 @@ import sys
 import copy
 
 class EstadosAnimados(object):
+    """
+    Cria animação em KML de dados por UF
+    """
     def __init__(self, kmlfile, extrude=1):
         self.extrude = extrude
         self.fname = kmlfile
@@ -56,8 +59,11 @@ class EstadosAnimados(object):
             alt.appendChild(self.kmlDoc.createTextNode('relativeToGround'))
             ex = self.kmlDoc.createElement('extrude')
             ex.appendChild(self.kmlDoc.createTextNode('1'))
+            ts = self.kmlDoc.createElement('tessellate')
+            ts.appendChild(self.kmlDoc.createTextNode('1'))
             pol.appendChild(alt)
             pol.appendChild(ex)
+            pol.appendChild(ts)
             lr = pm_newtime.getElementsByTagName('LinearRing')[0]
             nlr = self.extrude_polygon(lr, d[2])
             ob = pm_newtime.getElementsByTagName('outerBoundaryIs')[0]
@@ -97,10 +103,13 @@ class EstadosAnimados(object):
 #        altoff.appendChild(self.kmlDoc.createTextNode(str(d[2]*1000)))
         ex = self.kmlDoc.createElement('extrude')
         ex.appendChild(self.kmlDoc.createTextNode('1'))
+        ts = self.kmlDoc.createElement('tessellate')
+        ts.appendChild(self.kmlDoc.createTextNode('1'))
         lr.replaceChild(nc, c)
         lr.appendChild(alt)
         if self.extrude:
             lr.appendChild(ex)
+            lr.appendChild(ts)
 #        lr.appendChild(altoff)
         return lr
         

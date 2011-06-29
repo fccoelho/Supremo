@@ -78,15 +78,13 @@ def dyn_graph_general(elist, order, vstyles=[],estyles=[]):
     U.clear()
     nodes = {}
     edges = set([])
-    #print res[0]
     maxw = float(max(np.array([i[2] for i in elist]))) #largest weight
-    #U.beginMultiCall()
     if not vstyles:
         vstyles = cycle([U.newVertexStyle(id=1,shape="sphere", color="#ff0000")])
     else:
         vstyles = cycle(vstyles)
 
-    lei_style = U.newVertexStyle(id=2,shape="cube", color="#00ff00")
+    lei_style = U.newVertexStyle(id=2,shape="sphere", color="#00ff00")
 
     for e in elist:
         if e[0] not in nodes:

@@ -29,7 +29,7 @@ class Bosque(object):
 #        self.scene.title='Bosque do Supremo - %s'%nome
         self.scene.visible=0
         self.frame = frame()
-        label(text=nome,pos=(-2,2,0), depth=-0.3, color=color.blue, box=False,opacity=0)
+        label(text=nome,pos=(-2,3,0), depth=-0.3, color=color.blue, box=False,opacity=0)
         self.solo = cylinder(frame=self.frame,pos=(0,-0.1,0), axis=(0,0.11,0),radius=raio, color=(0.8,0.5,0.1), material=solo)
 
 
