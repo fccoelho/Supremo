@@ -20,7 +20,7 @@ Autores:
     
 Notas:
     - v0.2:
-        Nesta versão ao invés de executar individualmente cada inset,
+        Nesta versão ao invés de executar individualmente cada insert,
         optei por montar todas as queries de insert localmente, na 
         variável sqlstr, e enviar todo de uma única vez.
         Com isso gnhamos muito em performance, já que redizumos drasticamente

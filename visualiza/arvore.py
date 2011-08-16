@@ -25,7 +25,7 @@ class Bosque(object):
     """Cria uma cena bosque com todos os objetos incluidos """
     def __init__(self, nome, raio=10):
         self.scene = display(title=nome,x=0, y=0, width=600, height=400,
-     center=(0,0,0),forward=(0,-1,-2), background=(0,0,0))
+                    center=(0,0,0),forward=(0,-1,-2), background=(0,0,0))
 #        self.scene.title='Bosque do Supremo - %s'%nome
         self.scene.visible=0
         self.frame = frame()
@@ -264,8 +264,9 @@ class Arvore(object):
 #            o.rotate(axis=o.up, angle=(a-pi)/200.0)
 
 if __name__=="__main__":
+    scene = display(title='Teste',x=0, y=0, width=600, height=400, center=(0,0,0),forward=(0,-1,-2), background=(0,0,0))
     scene.visible=0
-    A = Arvore()
+    A = Arvore(frame())
     #A2 = Arvore(1,vector(2,0,2))
     #base
     cylinder(frame=A.frm,pos=(0,-0.1,0), axis=(0,0.11,0), color=(0.8,0.5,0.1), material=solo)
