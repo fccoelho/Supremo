@@ -4,22 +4,7 @@ Created on 05/04/2011
 
 @author: flavio
 '''
-'''
-Configurações:
-'''
-confs = "Flavio"
 
-if confs == "Flavio":
-    ubiServer = "http://10.250.46.208:20738/RPC2"
-    MySQLServer = "mysql://root:password@E04324"
-
-if confs == "Pablo":
-    ubiServer = "http://127.0.0.1:20738/RPC2"
-    MySQLServer = "mysql://pablo:pablo@E04324.fgv.br"
-
-'''
-Final das configurações
-'''
 
 import networkx as nx
 from networkx import NetworkXError
@@ -34,6 +19,24 @@ from matplotlib import cm
 import ubigraph
 import cPickle
 import gzip
+
+'''
+Configurações:
+'''
+confs = "Flavio"
+
+if confs == "Flavio":
+    passw = getpass.getpass("Senha do MySQL:")
+    ubiServer = "http://127.0.0.1:20738/RPC2"
+    MySQLServer = "mysql://root:passw@10.251.1.137"
+
+if confs == "Pablo":
+    ubiServer = "http://127.0.0.1:20738/RPC2"
+    MySQLServer = "mysql://pablo:pablo@10.251.1.137"
+
+'''
+Final das configurações
+'''
 
 cf88_vs_outras_q = """
 select 
