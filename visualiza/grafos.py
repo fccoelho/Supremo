@@ -19,16 +19,22 @@ from matplotlib import cm
 import ubigraph
 import cPickle
 import gzip
-
+import getpass
+import MySQLdb
+from MySQLdb.cursors import CursorUseResultMixIn,  DictCursor, SSDictCursor, SSCursor
 '''
 Configurações:
 '''
 confs = "Flavio"
 
 if confs == "Flavio":
-    passw = getpass.getpass("Senha do MySQL:")
+    dbgrafo =MySQLdb.connect(host="10.251.1.137", user="root", passwd="mysqlFGV13",db="SEN_Grafo")
+    dbdec =MySQLdb.connect(host="10.251.1.137", user="root", passwd="mysqlFGV13",db="STF_Analise_Decisao")
+    curgrafo=dbgrafo.cursor(cursorclass=SSCursor)
+    curdec=dbdec.cursor(cursorclass=SSCursor)
+#    passw = getpass.getpass("Senha do MySQL:")
     ubiServer = "http://127.0.0.1:20738/RPC2"
-    MySQLServer = "mysql://root:passw@10.251.1.137"
+#    MySQLServer = "mysql://root:passw@10.251.1.137"
 
 if confs == "Pablo":
     ubiServer = "http://127.0.0.1:20738/RPC2"
@@ -182,12 +188,12 @@ def lei_vs_lei(nedges=None):
     # Q = dbgrafo.execute('select lei_id_1,esfera_1,lei_1,lei_id_2,esfera_2, lei_2, peso from vw_gr_lei_lei where  peso >300 and lei_id_2>2')
     # Q = dbgrafo.execute('select lei_id_1,lei_tipo_1,lei_nome_1,lei_id_2,lei_tipo_2, lei_nome_2, peso from vw_gr_lei_lei where lei_count <= 20 and lei_id_1 = 1 and lei_id_2 <= 20 limit 0,1000')
     # Q = dbgrafo.execute('select lei_id_1,lei_tipo_1,lei_nome_1,lei_id_2,lei_tipo_2, lei_nome_2, peso from vw_gr_lei_lei where lei_count <= 8 and lei_id_1 <= 20 and lei_id_2 <= 20 limit 0,1000')
-    Q = dbgrafo.execute('select lei_id_1,esfera_1,lei_1,lei_id_2,esfera_2, lei_2, peso from vw_gr_lei_lei where lei_count <= 10 and lei_id_1 <= 50 and lei_id_2 <= 200 limit 0,10000')
+    curgrafo.execute('select lei_id_1,esfera_1,lei_1,lei_id_2,esfera_2, lei_2, peso from vw_gr_lei_lei where lei_count <= 10 and lei_id_1 <= 50 and lei_id_2 <= 200 limit 0,10000')
     if not nedges:
-        res = Q.fetchall()
+        res = curgrafo.fetchall()
         nedges = len(res)
     else:
-        res = Q.fetchmany(nedges)
+        res = curgrafo.fetchmany(nedges)
     eds = [(i[0],i[3],i[6]) for i in res]
     G = nx.Graph()
     #eds = [i[:3] for i in res]
@@ -203,12 +209,12 @@ def artigo_artigo(nedges=None):
     grafo de artigos de leis
     """
     
-    Q = dbgrafo.execute('select artigo_id_1,esfera_1,artigo_1,lei_1,artigo_id_2,esfera_2, artigo_2, lei_2, peso from vw_gr_artigo_artigo where  peso >100')
+    curgrafo.execute('select artigo_id_1,esfera_1,artigo_1,lei_1,artigo_id_2,esfera_2, artigo_2, lei_2, peso from vw_gr_artigo_artigo where  peso >100')
     if not nedges:
-        res = Q.fetchall()
+        res = curgrafo.fetchall()
         nedges = len(res)
     else:
-        res = Q.fetchmany(nedges)
+        res = curgrafo.fetchmany(nedges)
     eds = [(i[0],i[4],i[8]) for i in res]
     G = nx.Graph()
     G.add_weighted_edges_from(eds)
@@ -218,13 +224,13 @@ def ministro_lei(nedges=0):
     """
     Cria multigrafo de Ministros e leis
     """
-    Q = dbgrafo.execute('select origid, destid, weight from gr_ministro_lei where weight >100')
+    curgrafo.execute('select origid, destid, weight from gr_ministro_lei where weight >100')
     if not nedges:
-        res = Q.fetchall()
+        res = curgrafo.fetchall()
         nedges = len(res)
     else:
-        res = Q.fetchmany(nedges)
-    eds = [(i[0],i[1],i[2]) for i in res]
+        res = curgrafo.fetchmany(nedges)
+    eds = [(str(i[0]).decode('latin-1'),i[1],i[2]) for i in res]
     G = nx.DiGraph(nome='ministro_lei')
     G.add_weighted_edges_from(eds)
     return G, eds
@@ -292,14 +298,16 @@ def graph_stats(G):
     except NetworkXError:
         pass
 if __name__=="__main__":
-    dbgrafo = SqlSoup("%s/SEN_Grafo" % MySQLServer)
-    dbdec = SqlSoup("%s/STF_Analise_Decisao" % MySQLServer)
+#    dbgrafo = SqlSoup("%s/SEN_Grafo" % MySQLServer)
+#    dbdec = SqlSoup("%s/STF_Analise_Decisao" % MySQLServer)
 #    cf88_vs_outras(500)
 #    dyn_graph(1000)
 #    G,elist = lei_vs_lei()
+#    nx.write_graphml(G,'lei_lei.graphml')
 #    nx.readwrite.gpickle.write_gpickle(G, 'lei_lei.gpickle')
 #    artigo_artigo()
     G,elist = ministro_lei()
+    nx.write_graphml(G,'ministro_lei.graphml')
 #    nx.readwrite.gpickle.write_gpickle(G, 'ministro_lei.gpickle')
 #    G = cria_grafoNX_de_tabela(dbdec,'decisao')
 #    salva_grafoNX_db(G)
@@ -310,5 +318,5 @@ if __name__=="__main__":
 #    G = le_grafoNX_file('decisao')
     graph_stats(G)
 #    P.show()
-    dyn_graph_general(elist,G.order())
+    #~ dyn_graph_general(elist,G.order())
     
