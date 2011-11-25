@@ -224,7 +224,7 @@ def ministro_lei(nedges=0):
     """
     Cria multigrafo de Ministros e leis
     """
-    curgrafo.execute('select origid, destid, weight from gr_ministro_lei where weight >100')
+    curgrafo.execute('select origid, destid, weight from gr_ministro_lei where weight >50')
     if not nedges:
         res = curgrafo.fetchall()
         nedges = len(res)
@@ -297,6 +297,30 @@ def graph_stats(G):
         print "==> Avg. Clustering: ", nx.average_clustering(G)
     except NetworkXError:
         pass
+
+def analisa_ministro_lei(G):
+    """
+    Makes some analyses of the graph
+    """
+    print "++> Page rank for the laws"
+    print nx.pagerank_numpy(G,weight='weight')
+    print "++> Google Matrix"
+    print nx.google_matrix(G,weight='weight')
+    plot_hubs_and_authrities(G)
+    #saves the graph in graphml format
+    nx.write_graphml(G,'ministro_lei.graphml')
+
+def plot_hubs_and_authrities(G):
+    """
+    cria um bar plot
+    """
+    ha = nx.hits(G)
+    hubs = {(k,v) for k,v in ha[0] if v!=0.0}
+    auth = {(k,v) for k,v in ha[1] if v!=0.0}
+    fig = P.figure()
+    ax = fig.add_subplot(111)
+    ax.bar(np.arange(len(hubs)),hubs.values)
+
 if __name__=="__main__":
 #    dbgrafo = SqlSoup("%s/SEN_Grafo" % MySQLServer)
 #    dbdec = SqlSoup("%s/STF_Analise_Decisao" % MySQLServer)
@@ -306,8 +330,8 @@ if __name__=="__main__":
 #    nx.write_graphml(G,'lei_lei.graphml')
 #    nx.readwrite.gpickle.write_gpickle(G, 'lei_lei.gpickle')
 #    artigo_artigo()
-    G,elist = ministro_lei()
-    nx.write_graphml(G,'ministro_lei.graphml')
+    Gml,elist = ministro_lei()
+    analisa_ministro_lei(Gml)
 #    nx.readwrite.gpickle.write_gpickle(G, 'ministro_lei.gpickle')
 #    G = cria_grafoNX_de_tabela(dbdec,'decisao')
 #    salva_grafoNX_db(G)
@@ -316,7 +340,7 @@ if __name__=="__main__":
 #    Gl = cria_grafoNX_de_tabela(dbdec,'lei_decisao')
 #    salva_grafoNX_file(Gl)
 #    G = le_grafoNX_file('decisao')
-    graph_stats(G)
-#    P.show()
-    #~ dyn_graph_general(elist,G.order())
+#    graph_stats(G)
+    P.show()
+#    dyn_graph_general(elist,G.order())
     
