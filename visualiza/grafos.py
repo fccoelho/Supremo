@@ -230,7 +230,7 @@ def ministro_lei(nedges=0):
         nedges = len(res)
     else:
         res = curgrafo.fetchmany(nedges)
-    eds = [(str(i[0]).decode('latin-1'),i[1],i[2]) for i in res]
+    eds = [(str(i[0]),i[1],i[2]) for i in res]
     G = nx.DiGraph(nome='ministro_lei')
     G.add_weighted_edges_from(eds)
     return G, eds
@@ -302,24 +302,48 @@ def analisa_ministro_lei(G):
     """
     Makes some analyses of the graph
     """
-    print "++> Page rank for the laws"
-    print nx.pagerank_numpy(G,weight='weight')
-    print "++> Google Matrix"
-    print nx.google_matrix(G,weight='weight')
-    plot_hubs_and_authrities(G)
+#    print "++> Page rank for the laws"
+#    print nx.pagerank_numpy(G,weight='weight')
+#    print "++> Google Matrix"
+#    print nx.google_matrix(G,weight='weight')
+    plot_hubs_and_authorities(G)
     #saves the graph in graphml format
     nx.write_graphml(G,'ministro_lei.graphml')
+    nx.write_gml(G,'ministro_lei.gml')
 
-def plot_hubs_and_authrities(G):
+def plot_hubs_and_authorities(G):
     """
     cria um bar plot
     """
     ha = nx.hits(G)
-    hubs = {(k,v) for k,v in ha[0] if v!=0.0}
-    auth = {(k,v) for k,v in ha[1] if v!=0.0}
+    print G,len(ha)
+    hubs = {k:v for k,v in ha[0].items() if v!=0.0}
+    auth = {k:v for k,v in ha[1].items() if v!=0.0}
+    hubs.pop('None')
+    # Sorting by value
+    hubs = sorted(hubs.items(),key=lambda i:i[1],reverse=1)
+    auth = sorted(auth.items(),key=lambda i:i[1],reverse=1)
+
+    # Hubs
     fig = P.figure()
     ax = fig.add_subplot(111)
-    ax.bar(np.arange(len(hubs)),hubs.values)
+    labels = [l[0].decode('utf8') for l in hubs]
+    vals = [l[1] for l in hubs]
+    pos = np.arange(len(hubs))
+    ax.barh(pos,vals,align='center',height=.8,)
+    P.yticks(pos,labels,size='small')
+
+    # Authorities
+    fig = P.figure()
+    ax = fig.add_subplot(111)
+    auth = auth[:25] # only the most cited laws
+    labels = ['$%s$'%l[0] for l in auth]
+    vals = [l[1] for l in auth]
+    pos = np.arange(len(auth))
+    ax.barh(pos,vals,align='center',height=.8)
+    P.yticks(pos,labels)
+
+
 
 if __name__=="__main__":
 #    dbgrafo = SqlSoup("%s/SEN_Grafo" % MySQLServer)
