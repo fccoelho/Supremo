@@ -185,9 +185,9 @@ def lei_vs_lei(nedges=None):
     Grafo de todas com todas (leis)
     """
     # Verão original Flávio comentada
-    # Q = dbgrafo.execute('select lei_id_1,esfera_1,lei_1,lei_id_2,esfera_2, lei_2, peso from vw_gr_lei_lei where  peso >300 and lei_id_2>2')
-    # Q = dbgrafo.execute('select lei_id_1,lei_tipo_1,lei_nome_1,lei_id_2,lei_tipo_2, lei_nome_2, peso from vw_gr_lei_lei where lei_count <= 20 and lei_id_1 = 1 and lei_id_2 <= 20 limit 0,1000')
-    # Q = dbgrafo.execute('select lei_id_1,lei_tipo_1,lei_nome_1,lei_id_2,lei_tipo_2, lei_nome_2, peso from vw_gr_lei_lei where lei_count <= 8 and lei_id_1 <= 20 and lei_id_2 <= 20 limit 0,1000')
+    # curgrafo.execute('select lei_id_1,esfera_1,lei_1,lei_id_2,esfera_2, lei_2, peso from vw_gr_lei_lei where  peso >300 and lei_id_2>2')
+    # curgrafo.execute('select lei_id_1,lei_tipo_1,lei_nome_1,lei_id_2,lei_tipo_2, lei_nome_2, peso from vw_gr_lei_lei where lei_count <= 20 and lei_id_1 = 1 and lei_id_2 <= 20 limit 0,1000')
+    # curgrafo.execute('select lei_id_1,lei_tipo_1,lei_nome_1,lei_id_2,lei_tipo_2, lei_nome_2, peso from vw_gr_lei_lei where lei_count <= 8 and lei_id_1 <= 20 and lei_id_2 <= 20 limit 0,1000')
     curgrafo.execute('select lei_id_1,esfera_1,lei_1,lei_id_2,esfera_2, lei_2, peso from vw_gr_lei_lei where lei_count <= 10 and lei_id_1 <= 50 and lei_id_2 <= 200 limit 0,10000')
     if not nedges:
         res = curgrafo.fetchall()
@@ -201,7 +201,14 @@ def lei_vs_lei(nedges=None):
     print "== Grafo Lei_Lei =="
     print "==> Order: ",G.order()
     print "==> # Edges: ",len(G.edges())
-
+    # Adding attributes to nodes
+    for i in res:
+        G.node[i[0]]['esfera'] = i[1]
+        G.node[i[0]]['lei'] = i[2]
+        G.node[i[3]]['esfera'] = i[4]
+        G.node[i[3]]['lei'] = i[5]
+    nx.write_graphml(G,'lei_lei.graphml')
+    nx.write_gml(G,'lei_lei.gml')
     return G,res
 
 def artigo_artigo(nedges=None):
@@ -378,7 +385,7 @@ if __name__=="__main__":
 #    dbdec = SqlSoup("%s/STF_Analise_Decisao" % MySQLServer)
 #    cf88_vs_outras(500)
 #    dyn_graph(1000)
-#    G,elist = lei_vs_lei()
+    G,elist = lei_vs_lei()
 #    nx.write_graphml(G,'lei_lei.graphml')
 #    nx.readwrite.gpickle.write_gpickle(G, 'lei_lei.gpickle')
 #    artigo_artigo()
