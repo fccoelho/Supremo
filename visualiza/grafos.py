@@ -343,7 +343,35 @@ def plot_hubs_and_authorities(G):
     ax.barh(pos,vals,align='center',height=.8)
     P.yticks(pos,labels)
 
-
+def ministro_ministro(G):
+    """
+    Cria um grafo de ministros conectados de acordo com a sobreposição de seu uso da legislação
+    Construido a partir to grafo ministro_lei
+    """
+    GM = nx.Graph()
+    for m in G:
+        try:
+            int(m)
+        except ValueError:# Add only if node is a minister
+            if m != "None":
+                GM.add_node(m.decode('utf-8'))
+#    Add edges
+    for n in GM:
+        for m in GM:
+            if n == m: continue
+            if GM.has_edge(n,m) or GM.has_edge(m,n): continue
+            # Edge weight is the cardinality of the intersection each node neighbor set.
+            w = len(set(nx.neighbors(G,n.encode('utf-8'))) & set(nx.neighbors(G,m.encode('utf-8')))) #encode again to allow for matches
+            if w > 5:
+                GM.add_edge(n,m,{'weight':w})
+    # abreviate node names
+    GMA = nx.Graph()
+    GMA.add_weighted_edges_from([(o.replace('MIN.','').strip(),d.replace('MIN.','').strip(),di['weight']) for o,d,di in GM.edges_iter(data=True)])
+    P.figure()
+    nx.draw_spectral(GMA)
+    nx.write_graphml(GMA,'ministro_ministro.graphml')
+    nx.write_gml(GMA,'ministro_ministro.gml')
+    return GMA
 
 if __name__=="__main__":
 #    dbgrafo = SqlSoup("%s/SEN_Grafo" % MySQLServer)
@@ -356,6 +384,7 @@ if __name__=="__main__":
 #    artigo_artigo()
     Gml,elist = ministro_lei()
     analisa_ministro_lei(Gml)
+    ministro_ministro(Gml)
 #    nx.readwrite.gpickle.write_gpickle(G, 'ministro_lei.gpickle')
 #    G = cria_grafoNX_de_tabela(dbdec,'decisao')
 #    salva_grafoNX_db(G)
