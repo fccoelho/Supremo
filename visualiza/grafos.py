@@ -209,6 +209,8 @@ def lei_vs_lei(nedges=None):
         G.node[i[3]]['lei'] = i[5]
     nx.write_graphml(G,'lei_lei.graphml')
     nx.write_gml(G,'lei_lei.gml')
+    nx.write_pajek(G,'lei_lei.pajek')
+    nx.write_dot(G,'lei_lei.dot')
     return G,res
 
 def artigo_artigo(nedges=None):
@@ -317,7 +319,9 @@ def analisa_ministro_lei(G):
     #saves the graph in graphml format
     nx.write_graphml(G,'ministro_lei.graphml')
     nx.write_gml(G,'ministro_lei.gml')
-
+    nx.write_pajek(G,'ministro_lei.pajek')
+    nx.write_dot(G,'ministro_lei.dot')
+    
 def plot_hubs_and_authorities(G):
     """
     cria um bar plot
@@ -338,6 +342,8 @@ def plot_hubs_and_authorities(G):
     vals = [l[1] for l in hubs]
     pos = np.arange(len(hubs))
     ax.barh(pos,vals,align='center',height=.8,)
+    P.xlabel('Hub Statistic')
+    P.ylabel('Ministers')
     P.yticks(pos,labels,size='small')
 
     # Authorities
@@ -348,6 +354,8 @@ def plot_hubs_and_authorities(G):
     vals = [l[1] for l in auth]
     pos = np.arange(len(auth))
     ax.barh(pos,vals,align='center',height=.8)
+    P.xlabel('Authority Statistic')
+    P.ylabel('Law id')
     P.yticks(pos,labels)
 
 def ministro_ministro(G):
@@ -378,6 +386,8 @@ def ministro_ministro(G):
     nx.draw_spectral(GMA)
     nx.write_graphml(GMA,'ministro_ministro.graphml')
     nx.write_gml(GMA,'ministro_ministro.gml')
+    nx.write_pajek(GMA,'ministro_ministro.pajek')
+    nx.write_dot(GMA,'ministro_ministro.dot')
     return GMA
 
 if __name__=="__main__":
@@ -402,5 +412,5 @@ if __name__=="__main__":
 #    G = le_grafoNX_file('decisao')
 #    graph_stats(G)
     P.show()
-#    dyn_graph_general(elist,G.order())
+    #dyn_graph_general(elist,Gml.order())
     
